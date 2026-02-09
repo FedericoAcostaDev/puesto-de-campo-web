@@ -1,4 +1,4 @@
-import { useState } from "react"; // 1. Agregamos useState
+import { useState } from "react";
 import { X, Minus, Plus, ShoppingBag, Trash2, ArrowLeft } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import {
@@ -10,12 +10,15 @@ import {
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { Input } from "@/components/ui/input"; // Asegúrate de tener estos componentes de shadcn
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
 export function CartDrawer() {
-  const [step, setStep] = useState<"cart" | "checkout">("cart"); // Control de vista
+  const [step, setStep] = useState<"cart" | "checkout">("cart");
+  // Estados para el envío y la sucursal
+  const [shippingMethod, setShippingMethod] = useState("delivery");
+  const [branch, setBranch] = useState("");
 
   const {
     items,
@@ -34,7 +37,6 @@ export function CartDrawer() {
     }).format(price);
   };
 
-  // Resetear el paso al cerrar el drawer
   const handleOpenChange = (open: boolean) => {
     setIsCartOpen(open);
     if (!open) setTimeout(() => setStep("cart"), 300);
@@ -139,14 +141,18 @@ export function CartDrawer() {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label>Tipo de envío</Label>
-                      <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
-                        <option>Envío a domicilio</option>
-                        <option>Retiro en local</option>
+                      <select
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary"
+                        value={shippingMethod}
+                        onChange={(e) => setShippingMethod(e.target.value)}
+                      >
+                        <option value="delivery">Envío a domicilio</option>
+                        <option value="pickup">Retiro en local</option>
                       </select>
                     </div>
                     <div className="space-y-2">
                       <Label>Forma de pago</Label>
-                      <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+                      <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary">
                         <option>Efectivo</option>
                         <option>Transferencia</option>
                         <option>Mercado Pago</option>
@@ -154,15 +160,50 @@ export function CartDrawer() {
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label>Dirección de envío</Label>
-                    <Input placeholder="Calle, altura y departamento" />
-                  </div>
+                  {/* LÓGICA CONDICIONAL: DIRECCIÓN O SUCURSAL */}
+                  {shippingMethod === "delivery" ? (
+                    <div className="space-y-2 animate-in fade-in slide-in-from-left-2 duration-300">
+                      <Label htmlFor="address">Dirección de envío</Label>
+                      <Input
+                        id="address"
+                        placeholder="Calle, altura y departamento"
+                      />
+                    </div>
+                  ) : (
+                    <div className="space-y-2 animate-in fade-in slide-in-from-right-2 duration-300">
+                      <Label htmlFor="branch">Selecciona la sucursal</Label>
+                      <select
+                        id="branch"
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary"
+                        value={branch}
+                        onChange={(e) => setBranch(e.target.value)}
+                      >
+                        <option value="">Elegir sucursal...</option>
+                        <option value="Centro">
+                          Sucursal Centro (Av. Colón 123)
+                        </option>
+                        <option value="Norte">
+                          Sucursal Norte (Calle Ficticia 456)
+                        </option>
+                        <option value="Shopping">
+                          Sucursal Shopping (Local 45)
+                        </option>
+                      </select>
+                    </div>
+                  )}
 
                   <div className="space-y-2">
-                    <Label>Fecha y hora de retiro (si aplica)</Label>
+                    <Label>
+                      {shippingMethod === "pickup"
+                        ? "Fecha y hora de retiro"
+                        : "Notas adicionales o referencias"}
+                    </Label>
                     <Textarea
-                      placeholder="Decinos el día y hora..."
+                      placeholder={
+                        shippingMethod === "pickup"
+                          ? "Ej: Sábado a las 11hs"
+                          : "Ej: Portón blanco..."
+                      }
                       maxLength={70}
                       className="resize-none"
                     />
