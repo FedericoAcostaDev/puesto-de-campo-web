@@ -25,7 +25,6 @@ dist-ssr
 
 # Dependency directories and files
 yarn.lock
-package-lock.json
 .env
 .env.test
 .env.local
