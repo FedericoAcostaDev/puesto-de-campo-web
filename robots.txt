@@ -1,0 +1,16 @@
+# Allow all search engines to crawl the site
+User-agent: *
+Allow: /
+
+# Disallow crawling of private or administrative folders
+Disallow: /admin/
+Disallow: /config/
+Disallow: /private/
+
+# Optimization: Prevent crawling of internal search result pages to avoid duplicate content
+Disallow: /*?s=
+Disallow: /*?search=
+
+# Host and Sitemap (Update with your actual domain)
+Sitemap: https://www.puesto-de-campo-web.vercel.app/sitemap.xml
+Host: https://www.puesto-de-campo-web.vercel.app
