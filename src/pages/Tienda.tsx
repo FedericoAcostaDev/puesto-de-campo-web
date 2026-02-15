@@ -1,128 +1,100 @@
-import { useState, useEffect } from 'react'; // Añadimos useEffect
+import { useState, useEffect } from 'react';
 import { Layout } from '@/components/layout/Layout';
 import { ProductCard } from '@/components/store/ProductCard';
-import { getProducts, categories } from '@/data/products'; // Usamos getProducts
-import { Product } from '@/contexts/CartContext'; // Importamos el tipo para el estado
+import { getProducts, categories } from '@/data/products';
+import { Product } from '@/contexts/CartContext';
+
+// --- COMPONENTE SKELETON (Efecto de carga) ---
+const ProductSkeleton = () => (
+  <div className="bg-card rounded-xl border border-border overflow-hidden animate-pulse">
+    <div className="aspect-square bg-muted" /> {/* Espacio de la imagen */}
+    <div className="p-5 space-y-3">
+      <div className="h-4 bg-muted rounded w-1/2" /> {/* Título */}
+      <div className="h-3 bg-muted rounded w-full" /> {/* Descripción línea 1 */}
+      <div className="h-3 bg-muted rounded w-5/6" /> {/* Descripción línea 2 */}
+      <div className="flex justify-between items-center pt-4">
+        <div className="h-6 bg-muted rounded w-1/4" /> {/* Precio */}
+        <div className="h-10 bg-muted rounded w-1/3" /> {/* Botón */}
+      </div>
+    </div>
+  </div>
+);
 
 export default function Tienda() {
-  // 1. Estados para los productos y el estado de carga
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('Todos');
 
-  // 2. Efecto para cargar los productos al montar el componente
   useEffect(() => {
     const fetchItems = async () => {
       try {
         const data = await getProducts();
         setAllProducts(data);
       } catch (error) {
-        console.error("Error al cargar productos de Google Sheets:", error);
+        console.error("Error cargando productos:", error);
       } finally {
-        setLoading(false);
+        // Añadimos un pequeño delay artificial para que el skeleton no parpadee demasiado rápido
+        setTimeout(() => setLoading(false), 800);
       }
     };
-
     fetchItems();
   }, []);
 
-  // 3. El filtrado ahora usa 'allProducts' que viene del estado
   const filteredProducts =
     selectedCategory === 'Todos'
       ? allProducts
-      : allProducts.filter((product) => product.category === selectedCategory);
+      : allProducts.filter((p) => p.category === selectedCategory);
 
   return (
     <Layout>
-      {/* Hero */}
-      <section className="py-16 md:py-24 bg-card">
+      {/* Hero Section */}
+      <section className="py-16 bg-card">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="font-display text-4xl md:text-6xl font-bold text-foreground mb-4">
+          <h1 className="font-display text-4xl md:text-6xl font-bold mb-4">
             Nuestra <span className="text-primary">Tienda</span>
           </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Explorá nuestra selección de cortes premium y embutidos artesanales. 
-            Cada producto es seleccionado con el mayor cuidado.
-          </p>
         </div>
       </section>
 
-      {/* Products */}
-      <section className="py-12 md:py-20 bg-background">
+      {/* Main Content */}
+      <section className="py-12 bg-background">
         <div className="container mx-auto px-4">
           
-          {/* Category Filter */}
+          {/* Categorías */}
           <div className="flex flex-wrap justify-center gap-4 mb-12">
-            {categories.map((category) => (
+            {categories.map((cat) => (
               <button
-                key={category}
-                onClick={() => setSelectedCategory(category)}
-                className={`px-6 py-2 rounded-full text-sm font-medium uppercase tracking-wider transition-all duration-300 ${
-                  selectedCategory === category
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
+                  selectedCategory === cat
                     ? 'bg-primary text-primary-foreground'
-                    : 'bg-card text-muted-foreground hover:text-foreground border border-border hover:border-primary'
+                    : 'bg-card text-muted-foreground border border-border'
                 }`}
               >
-                {category}
+                {cat}
               </button>
             ))}
           </div>
 
-          {/* Product Grid / Loading State */}
-          {loading ? (
-            <div className="text-center py-20">
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary mb-4"></div>
-              <p className="text-muted-foreground">Cargando cortes del campo...</p>
-            </div>
-          ) : (
-            <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {filteredProducts.map((product) => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
-              </div>
-
-              {filteredProducts.length === 0 && (
-                <div className="text-center py-12">
-                  <p className="text-muted-foreground text-lg">
-                    No hay productos en esta categoría.
-                  </p>
-                </div>
-              )}
-            </>
-          )}
-        </div>
-      </section>
-
-      {/* Info Banner */}
-      <section className="py-12 bg-card border-t border-border">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-            <div>
-              <h3 className="font-display text-xl font-semibold text-foreground mb-2">
-                Envío Refrigerado
-              </h3>
-              <p className="text-muted-foreground">
-                Mantenemos la cadena de frío en todo el proceso
-              </p>
-            </div>
-            <div>
-              <h3 className="font-display text-xl font-semibold text-foreground mb-2">
-                Pago Seguro
-              </h3>
-              <p className="text-muted-foreground">
-                Múltiples métodos de pago para tu comodidad
-              </p>
-            </div>
-            <div>
-              <h3 className="font-display text-xl font-semibold text-foreground mb-2">
-                Calidad Garantizada
-              </h3>
-              <p className="text-muted-foreground">
-                Si no estás satisfecho, te devolvemos tu dinero
-              </p>
-            </div>
+          {/* Grid de Productos con Skeleton */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {loading ? (
+              // Mostramos 8 esqueletos mientras carga
+              Array.from({ length: 8 }).map((_, i) => <ProductSkeleton key={i} />)
+            ) : (
+              // Mostramos los productos reales
+              filteredProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))
+            )}
           </div>
+
+          {!loading && filteredProducts.length === 0 && (
+            <div className="text-center py-20">
+              <p className="text-muted-foreground">No encontramos cortes en esta categoría.</p>
+            </div>
+          )}
         </div>
       </section>
     </Layout>
