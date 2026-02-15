@@ -1,73 +1,102 @@
-# Welcome to your Lovable project
+# Puesto de Campo Web
 
-## Project info
+## 📖 Project Overview
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+Welcome to the **Puesto de Campo Web** repository. This project is a modern web application built to allow online shopping, and improve sales performance.
 
-## How can I edit this code?
+## 🎨 Design System
 
-There are several ways of editing your application.
+### Color Palette
+The application uses a specific color scheme to ensure brand consistency.
 
-**Use Lovable**
+| Color Name | Hex Code | Usage |
+|------------|----------|-------|
+| **Primary** | `#3FA69D` | Main buttons, active states, headers (Teal) |
+| **Secondary**| `#292E36` | Accents, highlights (Dark Grey) |
+| **Background**| `#121417` | Page backgrounds (Charcoal) |
+| **Surface** | `#1B1E24` | Cards, modals, sidebars (Light Charcoal) |
+| **Text** | `#F0EFE9` | Primary text content (Cream) |
+| **Accent** | `#D4A047` | Highlights, special actions (Gold) |
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+### Typography
+- **Headings**: **Playfair Display** (Serif). Used for page titles and section headers.
+- **Body**: **Lato** (Sans-serif). Used for primary text content.
 
-Changes made via Lovable will be committed automatically to this repo.
+## 🛠 Tech Stack
 
-**Use your preferred IDE**
+This project utilizes a modern, robust technology stack:
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Frontend
+- **Framework**: React
+- **Build Tool**: Vite
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **UI Components**: shadcn/ui
+- **State Management**: React Query / TanStack Query (if applicable)
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Backend & Database
+- **Database**: Supabase (PostgreSQL)
+- **Authentication**: Supabase Auth
+- **Hosting**: Vercel
 
-Follow these steps:
+## 🗄 Database Implementation
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### Connection
+The application connects to the Supabase database using environment variables. Ensure these are set in your local `.env` file and in your deployment environment.
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+```env
+VITE_SHEET_URL=your_google_seet_url
 ```
 
-**Edit a file directly in GitHub**
+### Data Structure
+*Briefly describe the core data models if necessary, e.g.:*
+- **Users**: Stores user profile information.
+- **Products**: Inventory items.
+- **Orders**: Transaction records.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 🚀 Deployment (Vercel)
 
-**Use GitHub Codespaces**
+To deploy this project on Vercel:
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+1.  **Push to GitHub**: Ensure your `main` branch is up to date.
+2.  **Import Project in Vercel**:
+    - Go to your Vercel Dashboard.
+    - Click **Add New > Project**.
+    - Select your GitHub repository.
+3.  **Configure Build Settings**:
+    - **Framework Preset**: Vite
+    - **Root Directory**: `./` (default)
+4.  **Environment Variables**:
+    - Copy the variables from your `.env` file into the Vercel Environment Variables section.
+5.  **Deploy**: Click **Deploy**. Vercel will build the project and provide a live URL.
 
-## What technologies are used for this project?
+## 🌿 Branching Strategy
 
-This project is built with:
+We follow a structured workflow to ensure code quality:
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- **`main`**: The production-ready branch. Deploys are triggered automatically when code is pushed here.
+- **`develop`** (Optional): A staging branch for testing features before they go live.
+- **`feature/feature-name`**: Created for specific tasks or new features.
+- **`fix/bug-name`**: Created for resolving specific bugs.
 
-## How can I deploy this project?
+**Workflow:**
+1.  Create a new branch from `main` (or `develop`).
+2.  Commit changes.
+3.  Open a Pull Request (PR).
+4.  Review and merge.
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+## 💻 Local Development
 
-## Can I connect a custom domain to my Lovable project?
+1.  **Clone the repo**:
+    ```sh
+    git clone <YOUR_GIT_URL>
+    ```
+2.  **Install dependencies**:
+    ```sh
+    npm install
+    ```
+3.  **Start development server**:
+    ```sh
+    npm run dev
+    ```
 
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
