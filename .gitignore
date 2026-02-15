@@ -29,7 +29,3 @@ yarn.lock
 .env.test
 .env.local
 package-lock.json
-
-.env
-.env.local
-package-lock.json
