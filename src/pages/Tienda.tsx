@@ -1,15 +1,36 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react'; // Añadimos useEffect
 import { Layout } from '@/components/layout/Layout';
 import { ProductCard } from '@/components/store/ProductCard';
-import { products, categories } from '@/data/products';
+import { getProducts, categories } from '@/data/products'; // Usamos getProducts
+import { Product } from '@/contexts/CartContext'; // Importamos el tipo para el estado
 
 export default function Tienda() {
+  // 1. Estados para los productos y el estado de carga
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('Todos');
 
+  // 2. Efecto para cargar los productos al montar el componente
+  useEffect(() => {
+    const fetchItems = async () => {
+      try {
+        const data = await getProducts();
+        setAllProducts(data);
+      } catch (error) {
+        console.error("Error al cargar productos de Google Sheets:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchItems();
+  }, []);
+
+  // 3. El filtrado ahora usa 'allProducts' que viene del estado
   const filteredProducts =
     selectedCategory === 'Todos'
-      ? products
-      : products.filter((product) => product.category === selectedCategory);
+      ? allProducts
+      : allProducts.filter((product) => product.category === selectedCategory);
 
   return (
     <Layout>
@@ -29,6 +50,7 @@ export default function Tienda() {
       {/* Products */}
       <section className="py-12 md:py-20 bg-background">
         <div className="container mx-auto px-4">
+          
           {/* Category Filter */}
           <div className="flex flex-wrap justify-center gap-4 mb-12">
             {categories.map((category) => (
@@ -46,19 +68,28 @@ export default function Tienda() {
             ))}
           </div>
 
-          {/* Product Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-
-          {filteredProducts.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground text-lg">
-                No hay productos en esta categoría.
-              </p>
+          {/* Product Grid / Loading State */}
+          {loading ? (
+            <div className="text-center py-20">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary mb-4"></div>
+              <p className="text-muted-foreground">Cargando cortes del campo...</p>
             </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {filteredProducts.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+
+              {filteredProducts.length === 0 && (
+                <div className="text-center py-12">
+                  <p className="text-muted-foreground text-lg">
+                    No hay productos en esta categoría.
+                  </p>
+                </div>
+              )}
+            </>
           )}
         </div>
       </section>

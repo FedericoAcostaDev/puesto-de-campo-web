@@ -1,78 +1,9 @@
-import { Product } from '@/contexts/CartContext';
+import { fetchProductsFromSheet } from '@/services/productService';
 
-export const products: Product[] = [
-  {
-    id: '1',
-    name: 'Bife de Chorizo',
-    description: 'Corte clásico argentino, jugoso y lleno de sabor. Ideal para la parrilla.',
-    price: 2850,
-    image: '/products/bife-chorizo.jpg',
-    category: 'Vacuno',
-    weight: '500g',
-  },
-  {
-    id: '2',
-    name: 'Ojo de Bife',
-    description: 'El rey de los cortes. Tierno, marmoleado y perfectamente madurado.',
-    price: 3200,
-    image: '/products/ojo-bife.jpg',
-    category: 'Vacuno',
-    weight: '450g',
-  },
-  {
-    id: '3',
-    name: 'Entraña',
-    description: 'Corte sabroso con textura única. El favorito de los parrilleros.',
-    price: 2400,
-    image: '/products/entrana.jpg',
-    category: 'Vacuno',
-    weight: '400g',
-  },
-  {
-    id: '4',
-    name: 'Vacío',
-    description: 'Corte tradicional para asado. Sabor intenso y auténtico.',
-    price: 2200,
-    image: '/products/vacio.jpg',
-    category: 'Vacuno',
-    weight: '600g',
-  },
-  {
-    id: '5',
-    name: 'Tira de Asado',
-    description: 'El corte esencial del asado argentino. Hueso y carne en perfecta armonía.',
-    price: 1950,
-    image: '/products/tira-asado.jpg',
-    category: 'Vacuno',
-    weight: '1kg',
-  },
-  {
-    id: '6',
-    name: 'Matambre',
-    description: 'Versátil y delicioso. Perfecto relleno o a la pizza.',
-    price: 2100,
-    image: '/products/matambre.jpg',
-    category: 'Vacuno',
-    weight: '800g',
-  },
-  {
-    id: '7',
-    name: 'Chorizo Criollo',
-    description: 'Embutido artesanal con especias tradicionales. El clásico del asado.',
-    price: 980,
-    image: '/products/chorizo.jpg',
-    category: 'Embutidos',
-    weight: '4 unidades',
-  },
-  {
-    id: '8',
-    name: 'Morcilla',
-    description: 'Elaborada con receta tradicional. Cremosa por dentro, crujiente por fuera.',
-    price: 850,
-    image: '/products/morcilla.jpg',
-    category: 'Embutidos',
-    weight: '4 unidades',
-  },
-];
+// Ya no definimos el array acá, lo traemos de la nube
+export const getProducts = async () => {
+  return await fetchProductsFromSheet();
+};
 
-export const categories = ['Todos', 'Vacuno', 'Embutidos'];
+// Las categorías pueden seguir siendo estáticas o podrías extraerlas de los productos
+export const categories = ['Todos', 'Vacuno', 'Embutidos', 'Cerdo', 'Achuras'];
