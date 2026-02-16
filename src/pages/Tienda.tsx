@@ -1,17 +1,17 @@
 import { useState, useEffect } from 'react';
 import { Layout } from '@/components/layout/Layout';
 import { ProductCard } from '@/components/store/ProductCard';
-import { getProducts } from '@/data/products'; // Quitamos 'categories' estático
+import { getProducts } from '@/data/products';
 import { Product } from '@/contexts/CartContext';
+// Importamos un icono de flecha (asumiendo que usas lucide-react o similar, si no, puedes usar un texto "^")
+import { ArrowUp } from 'lucide-react'; 
 
-// --- COMPONENTE SKELETON (Efecto de carga) ---
 const ProductSkeleton = () => (
   <div className="bg-card rounded-xl border border-border overflow-hidden animate-pulse">
     <div className="aspect-square bg-muted" />
-    <div className="p-5 space-y-3">
+    <div className="p-3 md:p-5 space-y-3">
       <div className="h-4 bg-muted rounded w-1/2" />
       <div className="h-3 bg-muted rounded w-full" />
-      <div className="h-3 bg-muted rounded w-5/6" />
       <div className="flex justify-between items-center pt-4">
         <div className="h-6 bg-muted rounded w-1/4" />
         <div className="h-10 bg-muted rounded w-1/3" />
@@ -24,23 +24,19 @@ export default function Tienda() {
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('Todos');
-  // Nuevo estado para las categorías dinámicas
   const [dynamicCategories, setDynamicCategories] = useState<string[]>(['Todos']);
+  
+  // --- ESTADO PARA EL BOTÓN "VOLVER ARRIBA" ---
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
   useEffect(() => {
     const fetchItems = async () => {
       try {
         const data = await getProducts();
         setAllProducts(data);
-
-        // --- LÓGICA DE CATEGORÍAS DINÁMICAS ---
-        // 1. Extraemos todas las categorías de los productos
         const rawCategories = data.map((p) => p.category);
-        // 2. Quitamos duplicados con Set y filtramos valores vacíos
         const uniqueCategories = Array.from(new Set(rawCategories)).filter(Boolean);
-        // 3. Ordenamos alfabéticamente y agregamos 'Todos' al principio
         setDynamicCategories(['Todos', ...uniqueCategories.sort()]);
-        
       } catch (error) {
         console.error("Error cargando productos:", error);
       } finally {
@@ -48,7 +44,18 @@ export default function Tienda() {
       }
     };
     fetchItems();
+
+    // Lógica para mostrar/ocultar botón flotante
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 400);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const filteredProducts =
     selectedCategory === 'Todos'
@@ -67,19 +74,19 @@ export default function Tienda() {
       </section>
 
       {/* Main Content */}
-      <section className="py-12 bg-background">
+      <section className="py-12 bg-background relative">
         <div className="container mx-auto px-4">
           
           {/* Categorías Dinámicas */}
-          <div className="flex flex-wrap justify-center gap-4 mb-12">
+          <div className="flex flex-wrap justify-center gap-2 md:gap-4 mb-12">
             {dynamicCategories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-6 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+                className={`px-4 py-2 md:px-6 md:py-2 rounded-full text-xs md:text-sm font-medium transition-all duration-300 ${
                   selectedCategory === cat
                     ? 'bg-primary text-primary-foreground shadow-lg'
-                    : 'bg-card text-muted-foreground border border-border hover:border-primary hover:text-foreground'
+                    : 'bg-card text-muted-foreground border border-border hover:border-primary'
                 }`}
               >
                 {cat}
@@ -87,8 +94,8 @@ export default function Tienda() {
             ))}
           </div>
 
-          {/* Grid de Productos con Skeleton */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {/* Grid de Productos - CAMBIO AQUÍ: grid-cols-2 */}
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6">
             {loading ? (
               Array.from({ length: 8 }).map((_, i) => <ProductSkeleton key={i} />)
             ) : (
@@ -105,6 +112,17 @@ export default function Tienda() {
           )}
         </div>
       </section>
+
+      {/* BOTÓN FLOTANTE */}
+      {showScrollTop && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-8 right-6 z-50 p-4 bg-primary text-primary-foreground rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300 animate-in fade-in zoom-in"
+          aria-label="Volver arriba"
+        >
+          <ArrowUp size={24} />
+        </button>
+      )}
     </Layout>
   );
 }
