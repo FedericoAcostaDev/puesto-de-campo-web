@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Beef, Award, Truck, Users } from 'lucide-react';
+import { ArrowRight, Beef, Award, Truck, Users, ArrowUp } from 'lucide-react'; // Añadimos ArrowUp
 import { Layout } from '@/components/layout/Layout';
-import { ProductCard } from '@/components/store/ProductCard'; // Importamos tu componente
-import { getProducts } from '@/data/products'; // Importamos la conexión a Google Sheets
+import { ProductCard } from '@/components/store/ProductCard';
+import { getProducts } from '@/data/products';
 import heroImage from '@/assets/hero-meat.jpg';
 import logo from '@/assets/logo.jpg';
 
@@ -30,11 +30,10 @@ const features = [
   },
 ];
 
-// Componente Skeleton simple para las ofertas mientras cargan
 const OfertaSkeleton = () => (
   <div className="bg-card rounded-xl border border-border overflow-hidden animate-pulse">
     <div className="aspect-square bg-muted" />
-    <div className="p-4 space-y-2">
+    <div className="p-3 md:p-4 space-y-2">
       <div className="h-4 bg-muted rounded w-2/3" />
       <div className="h-4 bg-muted rounded w-1/2" />
     </div>
@@ -44,12 +43,14 @@ const OfertaSkeleton = () => (
 export default function Index() {
   const [ofertas, setOfertas] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  // --- ESTADO PARA EL BOTÓN "VOLVER ARRIBA" ---
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
   useEffect(() => {
     const fetchOfertas = async () => {
       try {
         const data = await getProducts();
-        // Filtramos productos que tengan la categoría "Ofertas" (insensible a mayúsculas)
         const filtered = data.filter(
           (p) => p.category?.toLowerCase() === 'ofertas'
         );
@@ -61,7 +62,18 @@ export default function Index() {
       }
     };
     fetchOfertas();
+
+    // Lógica para detectar scroll
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 500);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <Layout>
@@ -101,7 +113,7 @@ export default function Index() {
         </div>
       </section>
 
-      {/* --- SECCIÓN DE OFERTAS (Solo aparece si hay productos en categoría Ofertas) --- */}
+      {/* SECCIÓN DE OFERTAS - Ajustado a 2 columnas en móvil */}
       {(loading || ofertas.length > 0) && (
         <section className="py-16 bg-background border-b border-border">
           <div className="container mx-auto px-4">
@@ -110,19 +122,18 @@ export default function Index() {
                 <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground">
                   Ofertas <span className="text-primary">Especiales</span>
                 </h2>
-                <p className="text-muted-foreground mt-2">Aprovechá estos cortes seleccionados con precio promocional.</p>
+                <p className="text-muted-foreground mt-2">Aprovechá estos cortes seleccionados.</p>
               </div>
               <Link to="/tienda" className="hidden sm:flex items-center gap-2 text-primary hover:underline font-medium">
                 Ir a la tienda <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Grid ajustado: grid-cols-2 en móvil */}
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
               {loading ? (
-                // Muestra 4 esqueletos mientras carga
                 Array.from({ length: 4 }).map((_, i) => <OfertaSkeleton key={i} />)
               ) : (
-                // Muestra los productos de oferta
                 ofertas.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))
@@ -134,24 +145,14 @@ export default function Index() {
 
       {/* About Section */}
       <section className="py-20 md:py-32 bg-card">
-        <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="font-display text-3xl md:text-5xl font-bold text-foreground mb-6">
-              Nuestra <span className="text-primary">Historia</span>
-            </h2>
-            <p className="text-lg text-muted-foreground leading-relaxed mb-8">
-              Puesto de Campo nace de la pasión por la carne argentina de calidad. 
-              Somos una empresa familiar dedicada a llevar los mejores cortes 
-              directamente del productor a tu hogar. Cada pieza que ofrecemos 
-              es seleccionada cuidadosamente, respetando la tradición del asado 
-              argentino y garantizando frescura en cada entrega.
-            </p>
-            <p className="text-lg text-muted-foreground leading-relaxed">
-              Trabajamos directamente con productores locales que comparten 
-              nuestros valores de calidad y respeto por el animal. 
-              El resultado: carne con el sabor auténtico del campo argentino.
-            </p>
-          </div>
+        <div className="container mx-auto px-4 text-center max-w-3xl">
+          <h2 className="font-display text-3xl md:text-5xl font-bold text-foreground mb-6">
+            Nuestra <span className="text-primary">Historia</span>
+          </h2>
+          <p className="text-lg text-muted-foreground leading-relaxed mb-8">
+            Puesto de Campo nace de la pasión por la carne argentina de calidad. 
+            Somos una empresa familiar dedicada a llevar los mejores cortes directamente del productor a tu hogar.
+          </p>
         </div>
       </section>
 
@@ -165,7 +166,7 @@ export default function Index() {
             {features.map((feature, index) => (
               <div
                 key={index}
-                className="p-6 rounded-xl bg-card border border-border hover:border-primary/50 transition-colors duration-300 group"
+                className="p-6 rounded-xl bg-card border border-border hover:border-primary/50 transition-colors group"
               >
                 <div className="w-14 h-14 rounded-lg bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
                   <feature.icon className="h-7 w-7 text-primary" />
@@ -188,10 +189,6 @@ export default function Index() {
           <h2 className="font-display text-3xl md:text-5xl font-bold text-primary-foreground mb-6">
             ¿Listo para probar?
           </h2>
-          <p className="text-lg text-primary-foreground/80 mb-8 max-w-2xl mx-auto">
-            Explorá nuestro catálogo y descubrí los mejores cortes de carne argentina. 
-            Hacemos envíos a domicilio con cadena de frío.
-          </p>
           <Link
             to="/tienda"
             className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-background text-foreground font-semibold uppercase tracking-wider rounded-lg hover:bg-foreground hover:text-background transition-colors duration-300"
@@ -201,6 +198,17 @@ export default function Index() {
           </Link>
         </div>
       </section>
+
+      {/* BOTÓN FLOTANTE VOLVER ARRIBA */}
+      {showScrollTop && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-8 right-6 z-50 p-4 bg-primary text-primary-foreground rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300 animate-in fade-in zoom-in"
+          aria-label="Volver arriba"
+        >
+          <ArrowUp size={24} />
+        </button>
+      )}
     </Layout>
   );
 }
