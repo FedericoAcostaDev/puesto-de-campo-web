@@ -1,6 +1,9 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Beef, Award, Truck, Users } from 'lucide-react';
 import { Layout } from '@/components/layout/Layout';
+import { ProductCard } from '@/components/store/ProductCard'; // Importamos tu componente
+import { getProducts } from '@/data/products'; // Importamos la conexión a Google Sheets
 import heroImage from '@/assets/hero-meat.jpg';
 import logo from '@/assets/logo.jpg';
 
@@ -27,7 +30,39 @@ const features = [
   },
 ];
 
+// Componente Skeleton simple para las ofertas mientras cargan
+const OfertaSkeleton = () => (
+  <div className="bg-card rounded-xl border border-border overflow-hidden animate-pulse">
+    <div className="aspect-square bg-muted" />
+    <div className="p-4 space-y-2">
+      <div className="h-4 bg-muted rounded w-2/3" />
+      <div className="h-4 bg-muted rounded w-1/2" />
+    </div>
+  </div>
+);
+
 export default function Index() {
+  const [ofertas, setOfertas] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchOfertas = async () => {
+      try {
+        const data = await getProducts();
+        // Filtramos productos que tengan la categoría "Ofertas" (insensible a mayúsculas)
+        const filtered = data.filter(
+          (p) => p.category?.toLowerCase() === 'ofertas'
+        );
+        setOfertas(filtered);
+      } catch (error) {
+        console.error("Error cargando ofertas en inicio:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchOfertas();
+  }, []);
+
   return (
     <Layout>
       {/* Hero Section */}
@@ -65,6 +100,37 @@ export default function Index() {
           </div>
         </div>
       </section>
+
+      {/* --- SECCIÓN DE OFERTAS (Solo aparece si hay productos en categoría Ofertas) --- */}
+      {(loading || ofertas.length > 0) && (
+        <section className="py-16 bg-background border-b border-border">
+          <div className="container mx-auto px-4">
+            <div className="flex justify-between items-end mb-10">
+              <div>
+                <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground">
+                  Ofertas <span className="text-primary">Especiales</span>
+                </h2>
+                <p className="text-muted-foreground mt-2">Aprovechá estos cortes seleccionados con precio promocional.</p>
+              </div>
+              <Link to="/tienda" className="hidden sm:flex items-center gap-2 text-primary hover:underline font-medium">
+                Ir a la tienda <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {loading ? (
+                // Muestra 4 esqueletos mientras carga
+                Array.from({ length: 4 }).map((_, i) => <OfertaSkeleton key={i} />)
+              ) : (
+                // Muestra los productos de oferta
+                ofertas.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))
+              )}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* About Section */}
       <section className="py-20 md:py-32 bg-card">
