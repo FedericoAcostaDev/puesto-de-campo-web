@@ -114,11 +114,11 @@ export default function Index() {
                 <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground">
                   Ofertas <span className="text-primary">Especiales</span>
                 </h2>
-                <p className="text-muted-foreground mt-2">Aprovechá estos cortes seleccionados.</p>
+                <p className="text-muted-foreground mt-2">Aprovechá estas promociones.</p>
               </div>
               
               <Link to="/tienda" className="flex items-center gap-2 text-primary hover:underline font-medium text-sm md:text-base">
-                Ir a la tienda <ArrowRight className="h-4 w-4" />
+                Tienda <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
 
