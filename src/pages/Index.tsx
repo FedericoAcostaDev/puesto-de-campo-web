@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Beef, Award, Truck, Users, ArrowUp } from 'lucide-react';
 import { Layout } from '@/components/layout/Layout';
 import { ProductCard } from '@/components/store/ProductCard';
-import { useProducts } from '@/hooks/useProducts'; // Usamos el nuevo hook
+import { useProducts } from '@/hooks/useProducts';
 import heroImage from '@/assets/hero-meat.jpg';
 import logo from '@/assets/logo.jpg';
 
@@ -41,15 +41,12 @@ const OfertaSkeleton = () => (
 );
 
 export default function Index() {
-  // --- CONSUMO DE DATOS OPTIMIZADO ---
   const { products, loading } = useProducts();
   
-  // Filtramos los productos que pertenecen a la categoría 'ofertas'
   const ofertas = products.filter(
     (p) => p.category?.toLowerCase() === 'ofertas'
   );
 
-  // --- ESTADO PARA EL BOTÓN "VOLVER ARRIBA" ---
   const [showScrollTop, setShowScrollTop] = useState(false);
 
   useEffect(() => {
@@ -66,6 +63,12 @@ export default function Index() {
 
   return (
     <Layout>
+      {/* Estilos locales para ocultar scrollbar del carrusel */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      `}} />
+
       {/* Hero Section */}
       <section className="relative min-h-[90vh] flex items-center justify-center texture-overlay">
         <div className="absolute inset-0">
@@ -102,7 +105,7 @@ export default function Index() {
         </div>
       </section>
 
-      {/* SECCIÓN DE OFERTAS - Visible en móvil y escritorio */}
+      {/* SECCIÓN DE OFERTAS */}
       {(loading || ofertas.length > 0) && (
         <section className="py-16 bg-background border-b border-border">
           <div className="container mx-auto px-4">
@@ -114,7 +117,6 @@ export default function Index() {
                 <p className="text-muted-foreground mt-2">Aprovechá estos cortes seleccionados.</p>
               </div>
               
-              {/* Enlace visible en Mobile (flex) y con tamaño de texto adaptativo */}
               <Link to="/tienda" className="flex items-center gap-2 text-primary hover:underline font-medium text-sm md:text-base">
                 Ir a la tienda <ArrowRight className="h-4 w-4" />
               </Link>
@@ -146,17 +148,19 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Features Section - AHORA CON CARRUSEL EN MOBILE */}
       <section className="py-20 md:py-32 bg-background">
         <div className="container mx-auto px-4">
           <h2 className="font-display text-3xl md:text-5xl font-bold text-center text-foreground mb-16">
             ¿Por qué <span className="text-primary">elegirnos</span>?
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          
+          {/* Contenedor: Flex lateral en mobile con snap, Grid en desktop */}
+          <div className="flex overflow-x-auto pb-8 md:pb-0 md:grid md:grid-cols-2 lg:grid-cols-4 gap-6 snap-x snap-mandatory hide-scrollbar">
             {features.map((feature, index) => (
               <div
                 key={index}
-                className="p-6 rounded-xl bg-card border border-border hover:border-primary/50 transition-colors group"
+                className="min-w-[85%] sm:min-w-[45%] md:min-w-0 snap-center p-6 rounded-xl bg-card border border-border hover:border-primary/50 transition-colors group"
               >
                 <div className="w-14 h-14 rounded-lg bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
                   <feature.icon className="h-7 w-7 text-primary" />
@@ -168,6 +172,13 @@ export default function Index() {
                   {feature.description}
                 </p>
               </div>
+            ))}
+          </div>
+
+          {/* Indicadores visuales (solo visibles en móvil) */}
+          <div className="flex justify-center gap-2 mt-4 md:hidden">
+            {features.map((_, i) => (
+              <div key={i} className="h-1.5 w-1.5 rounded-full bg-primary/30" />
             ))}
           </div>
         </div>
