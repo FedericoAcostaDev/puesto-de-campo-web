@@ -11,7 +11,7 @@ const features = [
   {
     icon: Beef,
     title: 'Cortes Premium',
-    description: 'Seleccionamos los mejores cortes de carne vacuna argentina, madurada naturalmente.',
+    description: 'Seleccionamos los mejores cortes de carne argentina, madurada naturalmente.',
   },
   {
     icon: Award,
@@ -21,12 +21,12 @@ const features = [
   {
     icon: Truck,
     title: 'Entrega a Domicilio',
-    description: 'Llevamos el sabor del campo directamente a tu puerta, en cadena de frío.',
+    description: 'Llevamos el sabor del campo directamente a tu puerta.',
   },
   {
     icon: Users,
     title: 'Tradición Familiar',
-    description: 'Más de 20 años de experiencia compartiendo el verdadero sabor de la carne.',
+    description: 'Más de 5 años de experiencia compartiendo el verdadero sabor de la carne.',
   },
 ];
 
