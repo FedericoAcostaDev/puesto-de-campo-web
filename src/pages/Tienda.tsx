@@ -1,9 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Layout } from '@/components/layout/Layout';
 import { ProductCard } from '@/components/store/ProductCard';
-import { getProducts } from '@/data/products';
-import { Product } from '@/contexts/CartContext';
-// Importamos un icono de flecha (asumiendo que usas lucide-react o similar, si no, puedes usar un texto "^")
+import { useProducts } from '@/hooks/useProducts'; // Tu nuevo hook estrella
 import { ArrowUp } from 'lucide-react'; 
 
 const ProductSkeleton = () => (
@@ -21,46 +19,36 @@ const ProductSkeleton = () => (
 );
 
 export default function Tienda() {
-  const [allProducts, setAllProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState('Todos');
-  const [dynamicCategories, setDynamicCategories] = useState<string[]>(['Todos']);
+  // 1. Consumimos los productos desde React Query
+  const { products, loading, isRefreshing } = useProducts();
   
-  // --- ESTADO PARA EL BOTÓN "VOLVER ARRIBA" ---
+  const [selectedCategory, setSelectedCategory] = useState('Todos');
   const [showScrollTop, setShowScrollTop] = useState(false);
 
-  useEffect(() => {
-    const fetchItems = async () => {
-      try {
-        const data = await getProducts();
-        setAllProducts(data);
-        const rawCategories = data.map((p) => p.category);
-        const uniqueCategories = Array.from(new Set(rawCategories)).filter(Boolean);
-        setDynamicCategories(['Todos', ...uniqueCategories.sort()]);
-      } catch (error) {
-        console.error("Error cargando productos:", error);
-      } finally {
-        setTimeout(() => setLoading(false), 800);
-      }
-    };
-    fetchItems();
+  // 2. Calculamos las categorías dinámicamente basándonos en los productos
+  // Usamos useMemo para que solo se recalcule si 'products' cambia
+  const dynamicCategories = useMemo(() => {
+    if (!products.length) return ['Todos'];
+    const rawCategories = products.map((p) => p.category);
+    const uniqueCategories = Array.from(new Set(rawCategories)).filter(Boolean);
+    return ['Todos', ...uniqueCategories.sort()];
+  }, [products]);
 
-    // Lógica para mostrar/ocultar botón flotante
-    const handleScroll = () => {
-      setShowScrollTop(window.scrollY > 400);
-    };
+  // 3. Filtramos los productos según la categoría seleccionada
+  const filteredProducts = useMemo(() => {
+    return selectedCategory === 'Todos'
+      ? products
+      : products.filter((p) => p.category === selectedCategory);
+  }, [selectedCategory, products]);
+
+  // Lógica de Scroll
+  useEffect(() => {
+    const handleScroll = () => setShowScrollTop(window.scrollY > 400);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const filteredProducts =
-    selectedCategory === 'Todos'
-      ? allProducts
-      : allProducts.filter((p) => p.category === selectedCategory);
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
   return (
     <Layout>
@@ -70,6 +58,9 @@ export default function Tienda() {
           <h1 className="font-display text-4xl md:text-6xl font-bold mb-4">
             Nuestra <span className="text-primary">Tienda</span>
           </h1>
+          {isRefreshing && (
+            <p className="text-xs text-primary animate-pulse">Actualizando stock en tiempo real...</p>
+          )}
         </div>
       </section>
 
@@ -94,7 +85,7 @@ export default function Tienda() {
             ))}
           </div>
 
-          {/* Grid de Productos - CAMBIO AQUÍ: grid-cols-2 */}
+          {/* Grid de Productos */}
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6">
             {loading ? (
               Array.from({ length: 8 }).map((_, i) => <ProductSkeleton key={i} />)

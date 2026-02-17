@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Beef, Award, Truck, Users, ArrowUp } from 'lucide-react'; // Añadimos ArrowUp
+import { ArrowRight, Beef, Award, Truck, Users, ArrowUp } from 'lucide-react';
 import { Layout } from '@/components/layout/Layout';
 import { ProductCard } from '@/components/store/ProductCard';
-import { getProducts } from '@/data/products';
+import { useProducts } from '@/hooks/useProducts'; // Usamos el nuevo hook
 import heroImage from '@/assets/hero-meat.jpg';
 import logo from '@/assets/logo.jpg';
 
@@ -41,29 +41,18 @@ const OfertaSkeleton = () => (
 );
 
 export default function Index() {
-  const [ofertas, setOfertas] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // --- CONSUMO DE DATOS OPTIMIZADO ---
+  const { products, loading } = useProducts();
   
+  // Filtramos los productos que pertenecen a la categoría 'ofertas'
+  const ofertas = products.filter(
+    (p) => p.category?.toLowerCase() === 'ofertas'
+  );
+
   // --- ESTADO PARA EL BOTÓN "VOLVER ARRIBA" ---
   const [showScrollTop, setShowScrollTop] = useState(false);
 
   useEffect(() => {
-    const fetchOfertas = async () => {
-      try {
-        const data = await getProducts();
-        const filtered = data.filter(
-          (p) => p.category?.toLowerCase() === 'ofertas'
-        );
-        setOfertas(filtered);
-      } catch (error) {
-        console.error("Error cargando ofertas en inicio:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchOfertas();
-
-    // Lógica para detectar scroll
     const handleScroll = () => {
       setShowScrollTop(window.scrollY > 500);
     };
@@ -101,11 +90,11 @@ export default function Index() {
               Del campo a tu mesa, con la frescura y el sabor que mereces.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link to="/tienda" className="btn-primary-custom rounded-lg inline-flex items-center justify-center gap-2">
+              <Link to="/tienda" className="btn-primary-custom rounded-lg inline-flex items-center justify-center gap-2 px-6 py-3">
                 Ver Productos
                 <ArrowRight className="h-4 w-4" />
               </Link>
-              <Link to="/contacto" className="btn-outline-custom rounded-lg inline-flex items-center justify-center">
+              <Link to="/contacto" className="btn-outline-custom rounded-lg inline-flex items-center justify-center px-6 py-3">
                 Contactanos
               </Link>
             </div>
@@ -113,7 +102,7 @@ export default function Index() {
         </div>
       </section>
 
-      {/* SECCIÓN DE OFERTAS - Ajustado a 2 columnas en móvil */}
+      {/* SECCIÓN DE OFERTAS - Visible en móvil y escritorio */}
       {(loading || ofertas.length > 0) && (
         <section className="py-16 bg-background border-b border-border">
           <div className="container mx-auto px-4">
@@ -124,12 +113,13 @@ export default function Index() {
                 </h2>
                 <p className="text-muted-foreground mt-2">Aprovechá estos cortes seleccionados.</p>
               </div>
-              <Link to="/tienda" className="hidden sm:flex items-center gap-2 text-primary hover:underline font-medium">
+              
+              {/* Enlace visible en Mobile (flex) y con tamaño de texto adaptativo */}
+              <Link to="/tienda" className="flex items-center gap-2 text-primary hover:underline font-medium text-sm md:text-base">
                 Ir a la tienda <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
 
-            {/* Grid ajustado: grid-cols-2 en móvil */}
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
               {loading ? (
                 Array.from({ length: 4 }).map((_, i) => <OfertaSkeleton key={i} />)
