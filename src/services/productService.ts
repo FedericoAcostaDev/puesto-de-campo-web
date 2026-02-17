@@ -7,7 +7,7 @@ import { Product } from '../types';
 const SHEET_URL = import.meta.env.VITE_SHEET_URL;
 
 // Definimos la constante de la imagen por defecto para fácil mantenimiento
-const DEFAULT_IMAGE = '/products/no-image.jpg';
+const DEFAULT_IMAGE = '/products/no-image.jpeg';
 
 export const fetchProductsFromSheet = async (): Promise<Product[]> => {
   if (!SHEET_URL) {
