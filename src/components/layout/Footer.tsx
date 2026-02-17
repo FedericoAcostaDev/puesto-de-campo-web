@@ -50,7 +50,7 @@ export function Footer() {
               </a>
               <div className="flex items-center gap-2">
                 <Phone className="h-4 w-4" />
-                +54 11 1234-5678
+                +54 3586101467
               </div>
               <div className="flex items-center gap-2">
                 <Mail className="h-4 w-4" />
@@ -58,7 +58,7 @@ export function Footer() {
               </div>
               <div className="flex items-center gap-2">
                 <MapPin className="h-4 w-4" />
-                Buenos Aires, Argentina
+                Río Cuarto, Cordoba, Argentina
               </div>
             </div>
           </div>
@@ -66,6 +66,7 @@ export function Footer() {
 
         <div className="mt-12 pt-8 border-t border-border text-center text-muted-foreground text-sm">
           <p>&copy; {new Date().getFullYear()} Puesto de Campo. Todos los derechos reservados.</p>
+          <p> Diseñado y desarrollado por <a href="https://github.com/FedericoAcostaDev" target="_blank" rel="noopener noreferrer">Federico Acosta</a></p>
         </div>
       </div>
     </footer>
