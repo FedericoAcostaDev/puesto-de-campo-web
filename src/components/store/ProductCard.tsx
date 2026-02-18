@@ -9,6 +9,12 @@ interface ProductCardProps {
 export function ProductCard({ product }: ProductCardProps) {
   const { addToCart } = useCart();
 
+  // Función para transformar "TEXTO" en "Texto"
+  const formatText = (text: string) => {
+    if (!text) return "";
+    return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+  };
+
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('es-AR', {
       style: 'currency',
@@ -17,8 +23,9 @@ export function ProductCard({ product }: ProductCardProps) {
   };
 
   const handleAddToCart = () => {
+    // Al agregar al carrito, usamos el nombre ya formateado para el toast
     addToCart(product);
-    toast.success(`${product.name} agregado al carrito`);
+    toast.success(`${formatText(product.name)} agregado al carrito`);
   };
 
   return (
@@ -44,11 +51,13 @@ export function ProductCard({ product }: ProductCardProps) {
         <span className="text-xs uppercase tracking-wider text-primary font-medium">
           {product.category}
         </span>
+        {/* Aplicamos formatText al nombre */}
         <h3 className="font-display text-lg font-semibold mt-1 text-foreground">
-          {product.name}
+          {formatText(product.name)}
         </h3>
+        {/* También lo aplicamos a la descripción por si viene del Excel igual */}
         <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-          {product.description}
+          {formatText(product.description)}
         </p>
         <div className="flex items-center justify-between mt-4">
           <span className="text-muted-foreground text-sm">{product.weight}</span>
