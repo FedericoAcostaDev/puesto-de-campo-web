@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useCart } from "@/contexts/CartContext";
-import { getProducts } from "@/data/products"; // Importamos tu función de fetch
+import { getProducts } from "@/data/products";
 import { Button } from "@/components/ui/button";
 import { Plus, ArrowLeft, ShieldCheck, Truck, Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -11,15 +11,11 @@ const DetalleProducto = () => {
   const navigate = useNavigate();
   const { addToCart } = useCart();
 
-  // 1. Usamos useQuery para obtener los productos. 
-  // Gracias a la caché que configuraste en App.tsx, esto no hará una 
-  // nueva petición si ya viniste desde la Tienda.
   const { data: products, isLoading } = useQuery({
     queryKey: ["products"],
     queryFn: getProducts,
   });
 
-  // 2. Buscamos el producto específico dentro del array que devuelve la caché
   const product = products?.find((p) => p.id === id);
 
   const handleAddToCart = () => {
@@ -36,7 +32,6 @@ const DetalleProducto = () => {
     }).format(price);
   };
 
-  // Estado de carga
   if (isLoading) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
@@ -45,7 +40,6 @@ const DetalleProducto = () => {
     );
   }
 
-  // Si no se encuentra el producto
   if (!product) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
@@ -58,74 +52,78 @@ const DetalleProducto = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background animate-in fade-in duration-500 pb-20">
-      <div className="max-w-7xl mx-auto px-4 pt-8">
-        {/* Navegación */}
+    // h-screen en desktop evita el scroll. overflow-hidden asegura que no haya barras laterales.
+    <div className="h-screen w-full bg-background animate-in fade-in duration-500 overflow-hidden flex flex-col">
+      <div className="max-w-7xl mx-auto px-4 h-full w-full flex flex-col justify-center py-4 md:py-0">
+        
+        {/* Botón Volver - Espaciado reducido */}
         <button 
           onClick={() => navigate(-1)}
-          className="flex items-center text-muted-foreground hover:text-primary transition-colors mb-8 group"
+          className="flex items-center text-muted-foreground hover:text-primary transition-colors mb-4 md:mb-6 group w-fit"
         >
-          <ArrowLeft className="h-5 w-5 mr-2 group-hover:-translate-x-1 transition-transform" />
+          <ArrowLeft className="h-4 w-4 mr-2 group-hover:-translate-x-1 transition-transform" />
           Volver
         </button>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
-          {/* Imagen */}
-          <div className="relative aspect-square rounded-3xl overflow-hidden bg-muted shadow-xl border border-border">
+        {/* Contenedor Principal: Centrado verticalmente en desktop */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-center">
+          
+          {/* Imagen: Maximizada pero contenida */}
+          <div className="relative aspect-square md:max-h-[70dvh] rounded-3xl overflow-hidden bg-muted shadow-xl border border-border">
             <img
               src={product.image}
               alt={product.name}
-              className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
+              className="w-full h-full object-cover"
             />
           </div>
 
-          {/* Info */}
-          <div className="flex flex-col space-y-8">
-            <div className="space-y-4">
-              <span className="inline-block px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-widest">
+          {/* Info: Flex col para controlar espacios */}
+          <div className="flex flex-col space-y-4 md:space-y-6">
+            <div className="space-y-2 md:space-y-4">
+              <span className="inline-block px-3 py-1 rounded-full bg-primary/10 text-primary text-[10px] md:text-xs font-bold uppercase tracking-widest">
                 {product.category}
               </span>
-              <h1 className="text-4xl md:text-6xl font-display font-bold text-foreground leading-tight">
+              <h1 className="text-3xl md:text-5xl lg:text-6xl font-display font-bold text-foreground leading-tight">
                 {product.name}
               </h1>
-              <p className="text-xl text-muted-foreground leading-relaxed italic">
+              <p className="text-lg md:text-xl text-muted-foreground leading-relaxed italic line-clamp-3">
                 {product.description}
               </p>
             </div>
 
             <div className="flex items-center gap-4">
-              <span className="text-4xl font-bold text-foreground">
+              <span className="text-3xl md:text-4xl font-bold text-foreground">
                 {formatPrice(product.price)}
               </span>
-              <span className="px-3 py-1 rounded-md bg-muted text-muted-foreground font-medium">
+              <span className="px-3 py-1 rounded-md bg-muted text-muted-foreground text-sm font-medium">
                 {product.weight}
               </span>
             </div>
 
-            <div className="pt-4">
+            <div className="pt-2">
               <Button 
                 onClick={handleAddToCart} 
                 size="lg" 
-                className="w-full md:w-[300px] h-16 text-xl font-bold gap-3 rounded-2xl shadow-lg hover:shadow-primary/20 transition-all active:scale-95"
+                className="w-full md:w-[280px] h-14 md:h-16 text-lg md:text-xl font-bold gap-3 rounded-2xl shadow-lg hover:shadow-primary/20 transition-all active:scale-95"
               >
-                <Plus className="h-6 w-6" />
+                <Plus className="h-5 w-5 md:h-6 md:w-6" />
                 Añadir al carrito
               </Button>
             </div>
 
-            {/* Garantías */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-8 border-t border-border">
-              <div className="flex items-center space-x-3 text-sm">
-                <div className="p-2 bg-primary/5 rounded-lg text-primary">
-                  <Truck className="h-5 w-5" />
+            {/* Garantías - Diseño compacto */}
+            <div className="grid grid-cols-2 gap-4 pt-6 border-t border-border">
+              <div className="flex items-center space-x-2 text-[11px] md:text-xs">
+                <div className="p-1.5 bg-primary/5 rounded-lg text-primary">
+                  <Truck className="h-4 w-4" />
                 </div>
-                <span className="font-medium">Envíos directos de campo</span>
+                <span className="font-medium leading-tight">Envíos a todo<br/>Río Cuarto</span>
               </div>
-              <div className="flex items-center space-x-3 text-sm">
-                <div className="p-2 bg-primary/5 rounded-lg text-primary">
-                  <ShieldCheck className="h-5 w-5" />
+              <div className="flex items-center space-x-2 text-[11px] md:text-xs">
+                <div className="p-1.5 bg-primary/5 rounded-lg text-primary">
+                  <ShieldCheck className="h-4 w-4" />
                 </div>
-                <span className="font-medium">Calidad 100% Artesanal</span>
+                <span className="font-medium leading-tight">Calidad 100%<br/>asegurada</span>
               </div>
             </div>
           </div>
