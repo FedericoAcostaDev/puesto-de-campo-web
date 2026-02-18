@@ -1,6 +1,8 @@
 import { Plus } from 'lucide-react';
 import { Product, useCart } from '@/contexts/CartContext';
 import { toast } from 'sonner';
+// 1. Importamos Link de react-router-dom
+import { Link } from 'react-router-dom';
 
 interface ProductCardProps {
   product: Product;
@@ -9,13 +11,11 @@ interface ProductCardProps {
 export function ProductCard({ product }: ProductCardProps) {
   const { addToCart } = useCart();
 
-  // Función para transformar "TEXTO" en "Texto"
   const formatText = (text: string) => {
     if (!text) return "";
     return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
   };
 
-  // Formato de moneda para la UI
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('es-AR', {
       style: 'currency',
@@ -23,12 +23,15 @@ export function ProductCard({ product }: ProductCardProps) {
     }).format(price);
   };
 
-  const handleAddToCart = () => {
+  // 2. Modificamos el handler para evitar que el click en el botón 
+  // dispare el Link del padre (bubbling)
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault(); // Evita la navegación si el botón está dentro de un Link
+    e.stopPropagation(); // Detiene la propagación del evento
     addToCart(product);
     toast.success(`${formatText(product.name)} agregado al carrito`);
   };
 
-  // --- Esquema JSON-LD para Google Shopping / SEO ---
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -36,10 +39,7 @@ export function ProductCard({ product }: ProductCardProps) {
     "image": product.image,
     "description": formatText(product.description),
     "sku": product.id || `puesto-${product.name.toLowerCase().replace(/\s+/g, '-')}`,
-    "brand": {
-      "@type": "Brand",
-      "name": "Puesto de Campo"
-    },
+    "brand": { "@type": "Brand", "name": "Puesto de Campo" },
     "offers": {
       "@type": "Offer",
       "url": typeof window !== "undefined" ? window.location.href : "",
@@ -47,13 +47,13 @@ export function ProductCard({ product }: ProductCardProps) {
       "price": product.price,
       "availability": "https://schema.org/InStock",
       "itemCondition": "https://schema.org/NewCondition",
-      "priceValidUntil": "2026-12-31" // Fecha límite sugerida para la oferta
+      "priceValidUntil": "2026-12-31"
     }
   };
 
   return (
-    <div className="card-product group">
-      {/* Datos Estructurados (Invisible para el usuario, visible para Google) */}
+    // 3. Envolvemos todo el contenido en un Link apuntando a la ruta dinámica
+    <Link to={`/producto/${product.id}`} className="card-product group block no-underline">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -69,9 +69,10 @@ export function ProductCard({ product }: ProductCardProps) {
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        
         <button
           onClick={handleAddToCart}
-          className="absolute bottom-4 right-4 p-3 bg-primary text-primary-foreground rounded-full opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 hover:scale-110"
+          className="absolute bottom-4 right-4 p-3 bg-primary text-primary-foreground rounded-full opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 hover:scale-110 z-10"
         >
           <Plus className="h-5 w-5" />
         </button>
@@ -97,6 +98,6 @@ export function ProductCard({ product }: ProductCardProps) {
           </span>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
