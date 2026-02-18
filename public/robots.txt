@@ -7,10 +7,10 @@ Disallow: /admin/
 Disallow: /config/
 Disallow: /private/
 
-# Optimization: Prevent crawling of internal search result pages to avoid duplicate content
+# Optimization: Prevent crawling of internal search result pages
 Disallow: /*?s=
 Disallow: /*?search=
 
-# Host and Sitemap (Update with your actual domain)
-Sitemap: https://www.puesto-de-campo-web.vercel.app/sitemap.xml
-Host: https://www.puesto-de-campo-web.vercel.app
+# Host and Sitemap (Ajustados sin el 'www' extra si no lo usas)
+Sitemap: https://puesto-de-campo-web.vercel.app/sitemap.xml
+Host: puesto-de-campo-web.vercel.app
