@@ -15,6 +15,7 @@ export function ProductCard({ product }: ProductCardProps) {
     return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
   };
 
+  // Formato de moneda para la UI
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('es-AR', {
       style: 'currency',
@@ -23,13 +24,41 @@ export function ProductCard({ product }: ProductCardProps) {
   };
 
   const handleAddToCart = () => {
-    // Al agregar al carrito, usamos el nombre ya formateado para el toast
     addToCart(product);
     toast.success(`${formatText(product.name)} agregado al carrito`);
   };
 
+  // --- Esquema JSON-LD para Google Shopping / SEO ---
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": formatText(product.name),
+    "image": product.image,
+    "description": formatText(product.description),
+    "sku": product.id || `puesto-${product.name.toLowerCase().replace(/\s+/g, '-')}`,
+    "brand": {
+      "@type": "Brand",
+      "name": "Puesto de Campo"
+    },
+    "offers": {
+      "@type": "Offer",
+      "url": typeof window !== "undefined" ? window.location.href : "",
+      "priceCurrency": "ARS",
+      "price": product.price,
+      "availability": "https://schema.org/InStock",
+      "itemCondition": "https://schema.org/NewCondition",
+      "priceValidUntil": "2026-12-31" // Fecha límite sugerida para la oferta
+    }
+  };
+
   return (
     <div className="card-product group">
+      {/* Datos Estructurados (Invisible para el usuario, visible para Google) */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
       <div className="relative aspect-square bg-muted overflow-hidden">
         <img
           src={product.image}
@@ -47,18 +76,20 @@ export function ProductCard({ product }: ProductCardProps) {
           <Plus className="h-5 w-5" />
         </button>
       </div>
+      
       <div className="p-4">
         <span className="text-xs uppercase tracking-wider text-primary font-medium">
           {product.category}
         </span>
-        {/* Aplicamos formatText al nombre */}
+        
         <h3 className="font-display text-lg font-semibold mt-1 text-foreground">
           {formatText(product.name)}
         </h3>
-        {/* También lo aplicamos a la descripción por si viene del Excel igual */}
+        
         <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
           {formatText(product.description)}
         </p>
+        
         <div className="flex items-center justify-between mt-4">
           <span className="text-muted-foreground text-sm">{product.weight}</span>
           <span className="text-lg font-semibold text-foreground">
