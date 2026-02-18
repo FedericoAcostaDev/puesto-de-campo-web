@@ -6,8 +6,39 @@ import { Product } from '../types';
  */
 const SHEET_URL = import.meta.env.VITE_SHEET_URL;
 
-// Definimos la constante de la imagen por defecto para fácil mantenimiento
+// Definimos la constante de la imagen por defecto
 const DEFAULT_IMAGE = '/products/no-image.jpeg';
+
+/**
+ * Función auxiliar para limpiar y formatear URLs de Google Drive.
+ * Convierte enlaces de compartir o de exportación en enlaces directos de imagen.
+ */
+const formatDriveUrl = (url: string): string => {
+  if (!url) return DEFAULT_IMAGE;
+  
+  // Si no es un link de Google Drive, lo devolvemos tal cual (por si usas otros hostings)
+  if (!url.includes('drive.google.com')) return url;
+
+  try {
+    let imageId = '';
+
+    // Caso 1: URL tipo 'id=1uRn6zcbxtqhDIX-LyTmIBmqFXrHMATE2'
+    if (url.includes('id=')) {
+      imageId = url.split('id=')[1].split('&')[0];
+    } 
+    // Caso 2: URL tipo 'file/d/1uRn6zcbxtqhDIX-LyTmIBmqFXrHMATE2/view'
+    else if (url.includes('/d/')) {
+      imageId = url.split('/d/')[1].split('/')[0];
+    }
+
+    return imageId 
+      ? `https://lh3.googleusercontent.com/u/0/d/${imageId}` 
+      : url;
+  } catch (error) {
+    console.warn("Error formateando URL de Drive:", error);
+    return url;
+  }
+};
 
 export const fetchProductsFromSheet = async (): Promise<Product[]> => {
   if (!SHEET_URL) {
@@ -31,15 +62,15 @@ export const fetchProductsFromSheet = async (): Promise<Product[]> => {
         skipEmptyLines: true,
         complete: (results) => {
           const cleanData = (results.data as any[])
-            .filter(p => p.name && p.id)
+            .filter(p => p.name && p.id) // Asegura que el producto tenga datos mínimos
             .map(p => ({
               id: String(p.id),
               name: String(p.name),
               description: p.description || '',
               price: Number(p.price) || 0,
-              // CAMBIO AQUÍ: Verificamos si existe la imagen y si no es un string vacío
+              // Aplicamos la lógica de formateo de imagen aquí
               image: (p.image && String(p.image).trim() !== '') 
-                ? p.image 
+                ? formatDriveUrl(String(p.image)) 
                 : DEFAULT_IMAGE,
               category: p.category || 'General',
               weight: String(p.weight || '')
