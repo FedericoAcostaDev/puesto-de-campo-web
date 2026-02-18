@@ -32,7 +32,7 @@ This project utilizes a modern, robust technology stack:
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS
 - **UI Components**: shadcn/ui
-- **State Management**: React Query / TanStack Query (if applicable)
+- **Data Fetching**: TanStack Query (React Query)
 
 ### Backend & Database
 - **Database**: Supabase (PostgreSQL)
@@ -46,6 +46,7 @@ The application connects to the Supabase database using environment variables. E
 
 ```env
 VITE_SHEET_URL=your_google_seet_url
+VITE_WHATSAPP_API_URL=your_whatsapp_api_url
 ```
 
 ### Data Structure
@@ -99,4 +100,3 @@ We follow a structured workflow to ensure code quality:
     ```sh
     npm run dev
     ```
-
