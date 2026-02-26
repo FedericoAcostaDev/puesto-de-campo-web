@@ -1,5 +1,14 @@
 import { useState, useEffect } from "react";
-import { X, Minus, Plus, ShoppingBag, Trash2, ArrowLeft, MessageCircle } from "lucide-react";
+import {
+  X,
+  Minus,
+  Plus,
+  ShoppingBag,
+  Trash2,
+  ArrowLeft,
+  MessageCircle,
+  CheckCircle2,
+} from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import {
   Sheet,
@@ -14,16 +23,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
-/**
- * tomamos el número desde el .env
- * Formato esperado en el .env: VITE_WHATSAPP_NUMBER=549XXXXXXXXX
- */
 const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER;
 
 export function CartDrawer() {
   const [step, setStep] = useState<"cart" | "checkout">("cart");
   const [shippingMethod, setShippingMethod] = useState("delivery");
-  
+  const [isSuccess, setIsSuccess] = useState(false);
+
   const [formData, setFormData] = useState({
     name: "",
     receiver: "",
@@ -43,7 +49,7 @@ export function CartDrawer() {
     clearCart,
   } = useCart();
 
-  // --- PERSISTENCIA: CARGAR DATOS ---
+  // --- PERSISTENCIA ---
   useEffect(() => {
     const savedData = localStorage.getItem("puesto-de-campo-customer");
     if (savedData) {
@@ -64,21 +70,26 @@ export function CartDrawer() {
     }
   }, []);
 
-  // --- PERSISTENCIA: GUARDAR DATOS ---
   const updateFormData = (updates: Partial<typeof formData>) => {
     const newData = { ...formData, ...updates };
     setFormData(newData);
-    localStorage.setItem("puesto-de-campo-customer", JSON.stringify({
-      ...newData,
-      shippingMethod
-    }));
+    localStorage.setItem(
+      "puesto-de-campo-customer",
+      JSON.stringify({
+        ...newData,
+        shippingMethod,
+      }),
+    );
   };
 
   useEffect(() => {
-    localStorage.setItem("puesto-de-campo-customer", JSON.stringify({
-      ...formData,
-      shippingMethod
-    }));
+    localStorage.setItem(
+      "puesto-de-campo-customer",
+      JSON.stringify({
+        ...formData,
+        shippingMethod,
+      }),
+    );
   }, [shippingMethod, formData]);
 
   const formatPrice = (price: number) => {
@@ -90,14 +101,18 @@ export function CartDrawer() {
 
   const handleOpenChange = (open: boolean) => {
     setIsCartOpen(open);
-    if (!open) setTimeout(() => setStep("cart"), 300);
+    if (!open) {
+      setTimeout(() => {
+        setStep("cart");
+        setIsSuccess(false);
+      }, 300);
+    }
   };
 
-  // --- LÓGICA DE WHATSAPP ---
+  // --- LÓGICA DE WHATSAPP CON CELEBRACIÓN ---
   const handleWhatsAppOrder = () => {
     if (!WHATSAPP_NUMBER) {
-      console.error("Error: VITE_WHATSAPP_NUMBER no está configurado en el .env");
-      alert("Error en la configuración del contacto. Por favor, intente más tarde.");
+      alert("Error en la configuración del contacto.");
       return;
     }
 
@@ -106,9 +121,9 @@ export function CartDrawer() {
     message += `👤 *Cliente:* ${formData.name}\n`;
     message += `📦 *Recibe:* ${formData.receiver || formData.name}\n`;
     message += `💳 *Pago:* ${formData.paymentMethod}\n`;
-    message += `🚚 *Método:* ${shippingMethod === 'delivery' ? 'Envío a domicilio' : 'Retiro en local'}\n`;
-    
-    if (shippingMethod === 'delivery') {
+    message += `🚚 *Método:* ${shippingMethod === "delivery" ? "Envío a domicilio" : "Retiro en local"}\n`;
+
+    if (shippingMethod === "delivery") {
       message += `📍 *Dirección:* ${formData.address}\n`;
     } else {
       message += `🏠 *Sucursal:* ${formData.branch}\n`;
@@ -124,16 +139,53 @@ export function CartDrawer() {
     message += `\n--------------------------------\n`;
     message += `💰 *TOTAL ESTIMADO: ${formatPrice(totalPrice)}*`;
 
+    // Trigger Success UI
+    setIsSuccess(true);
+
     const encodedMessage = encodeURIComponent(message);
-    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`, "_blank");
+    window.open(
+      `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`,
+      "_blank",
+    );
+
+    // Cleanup
+    setTimeout(() => {
+      clearCart();
+      setIsCartOpen(false);
+      setStep("cart");
+      setIsSuccess(false);
+    }, 2500);
   };
 
-  const isFormValid = formData.name.trim() !== "" && 
-    (shippingMethod === 'delivery' ? formData.address.trim() !== "" : formData.branch !== "");
+  const isFormValid =
+    formData.name.trim() !== "" &&
+    (shippingMethod === "delivery"
+      ? formData.address.trim() !== ""
+      : formData.branch !== "");
 
   return (
     <Sheet open={isCartOpen} onOpenChange={handleOpenChange}>
-      <SheetContent className="w-full sm:max-w-md bg-card border-border flex flex-col p-0">
+      <SheetContent className="w-full sm:max-w-md bg-card border-border flex flex-col p-0 overflow-hidden">
+        {/* SUCCESS OVERLAY */}
+        {isSuccess && (
+          <div className="absolute inset-0 z-50 bg-background/95 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center animate-in fade-in duration-300">
+            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-4 animate-in zoom-in duration-500 delay-150">
+              <CheckCircle2 className="h-10 w-10 text-green-600" />
+            </div>
+            <h3 className="text-2xl font-bold text-foreground font-display">
+              ¡Pedido Enviado!
+            </h3>
+            <p className="text-muted-foreground mt-2">
+              Te estamos redirigiendo a WhatsApp para finalizar la comunicación.
+            </p>
+            <div className="mt-8 flex gap-2">
+              <span className="w-2 h-2 bg-green-600 rounded-full animate-bounce" />
+              <span className="w-2 h-2 bg-green-600 rounded-full animate-bounce [animation-delay:0.2s]" />
+              <span className="w-2 h-2 bg-green-600 rounded-full animate-bounce [animation-delay:0.4s]" />
+            </div>
+          </div>
+        )}
+
         <SheetHeader className="p-6 pb-2">
           <SheetTitle className="font-display text-xl flex items-center gap-2">
             {step === "checkout" && (
@@ -155,7 +207,9 @@ export function CartDrawer() {
           <div className="flex flex-col items-center justify-center h-[60vh] text-muted-foreground px-6">
             <ShoppingBag className="h-16 w-16 mb-4 opacity-20" />
             <p className="text-lg font-medium">Tu carrito está vacío</p>
-            <Button variant="link" onClick={() => setIsCartOpen(false)}>Empezar a comprar</Button>
+            <Button variant="link" onClick={() => setIsCartOpen(false)}>
+              Empezar a comprar
+            </Button>
           </div>
         ) : (
           <>
@@ -163,26 +217,52 @@ export function CartDrawer() {
               {step === "cart" ? (
                 <div className="flex flex-col gap-4 py-4">
                   {items.map((item) => (
-                    <div key={item.id} className="flex gap-4 p-3 bg-secondary/50 rounded-xl border border-border/40">
+                    <div
+                      key={item.id}
+                      className="flex gap-4 p-3 bg-secondary/50 rounded-xl border border-border/40"
+                    >
                       <div className="w-20 h-20 bg-muted rounded-lg overflow-hidden shrink-0">
-                        <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="w-full h-full object-cover"
+                        />
                       </div>
                       <div className="flex flex-col justify-between flex-1">
                         <div>
-                          <h4 className="font-medium text-sm leading-tight mb-1">{item.name}</h4>
-                          <p className="text-primary font-bold">{formatPrice(item.price)}</p>
+                          <h4 className="font-medium text-sm leading-tight mb-1">
+                            {item.name}
+                          </h4>
+                          <p className="text-primary font-bold">
+                            {formatPrice(item.price)}
+                          </p>
                         </div>
                         <div className="flex items-center justify-between mt-2">
                           <div className="flex items-center gap-2 bg-background rounded-md border border-border p-1">
-                            <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="p-1 hover:text-primary transition-colors">
+                            <button
+                              onClick={() =>
+                                updateQuantity(item.id, item.quantity - 1)
+                              }
+                              className="p-1 hover:text-primary transition-colors"
+                            >
                               <Minus className="h-3 w-3" />
                             </button>
-                            <span className="w-6 text-center text-xs font-bold">{item.quantity}</span>
-                            <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="p-1 hover:text-primary transition-colors">
+                            <span className="w-6 text-center text-xs font-bold">
+                              {item.quantity}
+                            </span>
+                            <button
+                              onClick={() =>
+                                updateQuantity(item.id, item.quantity + 1)
+                              }
+                              className="p-1 hover:text-primary transition-colors"
+                            >
                               <Plus className="h-3 w-3" />
                             </button>
                           </div>
-                          <button onClick={() => removeFromCart(item.id)} className="text-muted-foreground hover:text-destructive transition-colors">
+                          <button
+                            onClick={() => removeFromCart(item.id)}
+                            className="text-muted-foreground hover:text-destructive transition-colors"
+                          >
                             <Trash2 className="h-4 w-4" />
                           </button>
                         </div>
@@ -192,22 +272,50 @@ export function CartDrawer() {
                 </div>
               ) : (
                 <div className="space-y-5 py-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Nombre de quien compra</Label>
-                    <Input id="name" placeholder="Ej: Juan Pérez" value={formData.name} onChange={(e) => updateFormData({ name: e.target.value })} />
+                  {/* PROMINENT NAME FIELD */}
+                  <div className="space-y-2 p-4 bg-primary/5 rounded-xl border border-primary/10">
+                    <Label
+                      htmlFor="name"
+                      className="text-base font-semibold flex items-center gap-1"
+                    >
+                      Nombre de quien compra{" "}
+                      <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
+                      id="name"
+                      placeholder="Ej: Juan Pérez"
+                      className="bg-background text-lg h-12 border-primary/20 focus-visible:ring-primary"
+                      value={formData.name}
+                      onChange={(e) => updateFormData({ name: e.target.value })}
+                    />
+                    {!formData.name.trim() && (
+                      <p className="text-[11px] text-destructive animate-pulse font-medium">
+                        Este campo es obligatorio
+                      </p>
+                    )}
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label>Tipo de entrega</Label>
-                      <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={shippingMethod} onChange={(e) => setShippingMethod(e.target.value)}>
+                      <select
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        value={shippingMethod}
+                        onChange={(e) => setShippingMethod(e.target.value)}
+                      >
                         <option value="delivery">Envío a domicilio</option>
                         <option value="pickup">Retiro en local</option>
                       </select>
                     </div>
                     <div className="space-y-2">
                       <Label>Forma de pago</Label>
-                      <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={formData.paymentMethod} onChange={(e) => updateFormData({ paymentMethod: e.target.value })}>
+                      <select
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        value={formData.paymentMethod}
+                        onChange={(e) =>
+                          updateFormData({ paymentMethod: e.target.value })
+                        }
+                      >
                         <option value="Efectivo">Efectivo</option>
                         <option value="Transferencia">Transferencia</option>
                         <option value="Mercado Pago">Mercado Pago</option>
@@ -217,29 +325,86 @@ export function CartDrawer() {
 
                   {shippingMethod === "delivery" ? (
                     <div className="space-y-2 animate-in fade-in slide-in-from-left-2 duration-300">
-                      <Label htmlFor="address">Dirección de envío</Label>
-                      <Input id="address" placeholder="Calle, número, depto..." value={formData.address} onChange={(e) => updateFormData({ address: e.target.value })} />
+                      <Label
+                        htmlFor="address"
+                        className="flex items-center gap-1"
+                      >
+                        Dirección de envío{" "}
+                        <span className="text-destructive">*</span>
+                      </Label>
+                      <Input
+                        id="address"
+                        placeholder="Calle, número, depto..."
+                        value={formData.address}
+                        onChange={(e) =>
+                          updateFormData({ address: e.target.value })
+                        }
+                      />
+                      {!formData.address.trim() && (
+                        <p className="text-[11px] text-destructive">
+                          Por favor, indica tu dirección
+                        </p>
+                      )}
                     </div>
                   ) : (
                     <div className="space-y-2 animate-in fade-in slide-in-from-right-2 duration-300">
-                      <Label htmlFor="branch">Selecciona la sucursal</Label>
-                      <select id="branch" className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={formData.branch} onChange={(e) => updateFormData({ branch: e.target.value })}>
+                      <Label
+                        htmlFor="branch"
+                        className="flex items-center gap-1"
+                      >
+                        Selecciona la sucursal{" "}
+                        <span className="text-destructive">*</span>
+                      </Label>
+                      <select
+                        id="branch"
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        value={formData.branch}
+                        onChange={(e) =>
+                          updateFormData({ branch: e.target.value })
+                        }
+                      >
                         <option value="">Elegir...</option>
-                        <option value="Sucursal Centro">Centro (Av. Colón 123)</option>
-                        <option value="Sucursal Norte">Norte (Calle Ficticia 456)</option>
+                        <option value="Sucursal Centro">
+                          Centro (Av. Colón 123)
+                        </option>
+                        <option value="Sucursal Norte">
+                          Norte (Calle Ficticia 456)
+                        </option>
                       </select>
+                      {!formData.branch && (
+                        <p className="text-[11px] text-destructive">
+                          Debes elegir una sucursal
+                        </p>
+                      )}
                     </div>
                   )}
 
                   <div className="space-y-2">
                     <Label htmlFor="receiver">¿Quién recibe? (opcional)</Label>
-                    <Input id="receiver" placeholder="Nombre de la persona" value={formData.receiver} onChange={(e) => updateFormData({ receiver: e.target.value })} />
+                    <Input
+                      id="receiver"
+                      placeholder="Nombre de la persona"
+                      value={formData.receiver}
+                      onChange={(e) =>
+                        updateFormData({ receiver: e.target.value })
+                      }
+                    />
                   </div>
 
                   <div className="space-y-2">
                     <Label>Notas o referencias</Label>
-                    <Textarea placeholder="Ej: Portón negro, tocar timbre fuerte..." maxLength={70} className="resize-none h-20" value={formData.notes} onChange={(e) => updateFormData({ notes: e.target.value })} />
-                    <p className="text-[10px] text-right text-muted-foreground">{formData.notes.length}/70</p>
+                    <Textarea
+                      placeholder="Ej: Portón negro, tocar timbre fuerte..."
+                      maxLength={70}
+                      className="resize-none h-20"
+                      value={formData.notes}
+                      onChange={(e) =>
+                        updateFormData({ notes: e.target.value })
+                      }
+                    />
+                    <p className="text-[10px] text-right text-muted-foreground">
+                      {formData.notes.length}/70
+                    </p>
                   </div>
                 </div>
               )}
@@ -248,21 +413,30 @@ export function CartDrawer() {
             <div className="mt-auto p-6 bg-background border-t border-border space-y-4">
               <div className="flex items-center justify-between text-lg">
                 <span className="font-medium">Total estimado</span>
-                <span className="font-display font-bold text-primary text-xl">{formatPrice(totalPrice)}</span>
+                <span className="font-display font-bold text-primary text-xl">
+                  {formatPrice(totalPrice)}
+                </span>
               </div>
 
               {step === "cart" ? (
                 <div className="flex flex-col gap-2">
-                  <Button className="w-full h-12 text-md font-bold rounded-xl btn-primary-custom" onClick={() => setStep("checkout")}>
+                  <Button
+                    className="w-full h-12 text-md font-bold rounded-xl bg-primary text-primary-foreground hover:opacity-90 transition-opacity"
+                    onClick={() => setStep("checkout")}
+                  >
                     Confirmar Pedido
                   </Button>
-                  <Button variant="ghost" onClick={clearCart} className="text-muted-foreground text-xs hover:text-destructive">
+                  <Button
+                    variant="ghost"
+                    onClick={clearCart}
+                    className="text-muted-foreground text-xs hover:text-destructive"
+                  >
                     Vaciar mi carrito
                   </Button>
                 </div>
               ) : (
-                <Button 
-                  className="w-full h-12 text-md font-bold rounded-xl bg-green-600 hover:bg-green-700 text-white flex gap-2 items-center" 
+                <Button
+                  className="w-full h-12 text-md font-bold rounded-xl bg-green-600 hover:bg-green-700 text-white flex gap-2 items-center transition-all disabled:opacity-50 disabled:grayscale"
                   onClick={handleWhatsAppOrder}
                   disabled={!isFormValid}
                 >
