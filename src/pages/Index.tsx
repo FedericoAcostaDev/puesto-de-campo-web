@@ -45,19 +45,15 @@ const OfertaSkeleton = () => (
 
 export default function Index() {
   const { products, loading } = useProducts();
-
   const ofertas = products.filter(
     (p) => p.category?.toLowerCase() === "ofertas",
   );
-
   const [showScrollTop, setShowScrollTop] = useState(false);
 
-  // CHANGE: Ensure the page starts at the top when mounted
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  // Scroll listener for the "Back to Top" button visibility
   useEffect(() => {
     const handleScroll = () => {
       setShowScrollTop(window.scrollY > 500);
@@ -72,7 +68,6 @@ export default function Index() {
 
   return (
     <Layout>
-      {/* Estilos locales para ocultar scrollbar del carrusel */}
       <style
         dangerouslySetInnerHTML={{
           __html: `
@@ -83,43 +78,46 @@ export default function Index() {
       />
 
       {/* Hero Section */}
-      <section className="relative min-h-[90vh] flex items-center justify-center texture-overlay">
+      <section className="relative min-h-[75vh] md:min-h-[80vh] flex items-center justify-center texture-overlay overflow-hidden">
         <div className="absolute inset-0">
           <img
             src={heroImage}
             alt="Carne Argentina Premium"
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-background/60" />
+          <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/80 to-background" />
         </div>
 
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-2xl animate-slide-up">
-            <img
-              src={logo}
-              alt="Puesto de Campo"
-              className="h-24 md:h-32 mb-8"
-            />
+        <div className="container mx-auto px-4 relative z-10 pt-12 pb-28 md:py-20">
+          <div className="max-w-2xl mx-auto md:mx-0 flex flex-col items-center md:items-start text-center md:text-left animate-slide-up">
+            <div className="mb-10 md:mb-8">
+              <img
+                src={logo}
+                alt="Puesto de Campo"
+                className="h-32 sm:h-40 md:h-32 w-auto rounded-2xl shadow-xl border-2 border-primary/20 object-contain bg-white/10 backdrop-blur-sm p-1"
+              />
+            </div>
+
             <h1 className="font-display text-4xl md:text-6xl font-bold text-foreground mb-6 leading-tight">
               El Sabor Natural
               <br />
               <span className="text-primary">de la Carne</span>
             </h1>
-            <p className="text-lg md:text-xl text-muted-foreground mb-8 leading-relaxed">
+            <p className="text-lg md:text-xl text-muted-foreground mb-8 leading-relaxed max-w-md md:max-w-none">
               Descubrí la calidad premium de nuestros cortes argentinos. Del
-              campo a tu mesa, con la frescura y el sabor que mereces.
+              campo a tu mesa.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
               <Link
                 to="/tienda"
-                className="btn-primary-custom rounded-lg inline-flex items-center justify-center gap-2 px-6 py-3"
+                className="btn-primary-custom rounded-lg inline-flex items-center justify-center gap-2 px-8 py-4 md:px-6 md:py-3"
               >
                 Ver Productos
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
                 to="/contacto"
-                className="btn-outline-custom rounded-lg inline-flex items-center justify-center px-6 py-3"
+                className="btn-outline-custom rounded-lg inline-flex items-center justify-center px-8 py-4 md:px-6 md:py-3"
               >
                 Contactanos
               </Link>
@@ -130,34 +128,50 @@ export default function Index() {
 
       {/* SECCIÓN DE OFERTAS */}
       {(loading || ofertas.length > 0) && (
-        <section className="py-16 bg-background border-b border-border">
+        <section className="relative z-20 -mt-20 md:-mt-24 pb-16">
           <div className="container mx-auto px-4">
-            <div className="flex justify-between items-end mb-10">
-              <div>
-                <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground">
-                  Ofertas <span className="text-primary">Especiales</span>
-                </h2>
-                <p className="text-muted-foreground mt-2">
-                  Aprovechá estas promociones.
-                </p>
+            <div className="bg-background border border-border rounded-3xl md:rounded-[3rem] p-6 md:p-12 shadow-2xl">
+              {/* Header: Title and Description only on mobile */}
+              <div className="flex justify-between items-end mb-10">
+                <div className="space-y-2">
+                  <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground">
+                    Ofertas <span className="text-primary">Especiales</span>
+                  </h2>
+                  <p className="text-muted-foreground text-sm md:text-base">
+                    Aprovechá estas promociones por tiempo limitado.
+                  </p>
+                </div>
+
+                {/* Hidden on mobile, shown on desktop top-right */}
+                <Link
+                  to="/tienda"
+                  className="hidden md:flex items-center gap-2 text-primary hover:text-primary/80 transition-colors font-semibold"
+                >
+                  Ver Todo <ArrowRight className="h-4 w-4" />
+                </Link>
               </div>
 
-              <Link
-                to="/tienda"
-                className="flex items-center gap-2 text-primary hover:underline font-medium text-sm md:text-base"
-              >
-                Tienda <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
+              {/* Products Grid */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
+                {loading
+                  ? Array.from({ length: 4 }).map((_, i) => (
+                      <OfertaSkeleton key={i} />
+                    ))
+                  : ofertas.map((product) => (
+                      <ProductCard key={product.id} product={product} />
+                    ))}
+              </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
-              {loading
-                ? Array.from({ length: 4 }).map((_, i) => (
-                    <OfertaSkeleton key={i} />
-                  ))
-                : ofertas.map((product) => (
-                    <ProductCard key={product.id} product={product} />
-                  ))}
+              {/* Footer Button: Shown only on mobile at the bottom */}
+              <div className="mt-8 md:hidden">
+                <Link
+                  to="/tienda"
+                  className="group flex items-center justify-center gap-2 text-primary border border-primary/20 rounded-xl py-4 font-bold text-sm bg-primary/5 active:bg-primary/10 transition-colors"
+                >
+                  Ver Todo el Catálogo
+                  <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </div>
             </div>
           </div>
         </section>
@@ -200,12 +214,6 @@ export default function Index() {
               </div>
             ))}
           </div>
-
-          <div className="flex justify-center gap-2 mt-4 md:hidden">
-            {features.map((_, i) => (
-              <div key={i} className="h-1.5 w-1.5 rounded-full bg-primary/30" />
-            ))}
-          </div>
         </div>
       </section>
 
@@ -225,11 +233,11 @@ export default function Index() {
         </div>
       </section>
 
-      {/* BOTÓN FLOTANTE VOLVER ARRIBA */}
+      {/* Back to Top */}
       {showScrollTop && (
         <button
           onClick={scrollToTop}
-          className="fixed bottom-8 right-6 z-50 p-4 bg-primary text-primary-foreground rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300 animate-in fade-in zoom-in"
+          className="fixed bottom-8 right-6 z-50 p-4 bg-primary text-primary-foreground rounded-full shadow-2xl hover:scale-110 transition-all duration-300 animate-in fade-in zoom-in"
           aria-label="Volver arriba"
         >
           <ArrowUp size={24} />
