@@ -131,7 +131,6 @@ export default function Index() {
         <section className="relative z-20 -mt-20 md:-mt-24 pb-16">
           <div className="container mx-auto px-4">
             <div className="bg-background border border-border rounded-3xl md:rounded-[3rem] p-6 md:p-12 shadow-2xl">
-              {/* Header: Title and Description only on mobile */}
               <div className="flex justify-between items-end mb-10">
                 <div className="space-y-2">
                   <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground">
@@ -142,7 +141,6 @@ export default function Index() {
                   </p>
                 </div>
 
-                {/* Hidden on mobile, shown on desktop top-right */}
                 <Link
                   to="/tienda"
                   className="hidden md:flex items-center gap-2 text-primary hover:text-primary/80 transition-colors font-semibold"
@@ -151,8 +149,11 @@ export default function Index() {
                 </Link>
               </div>
 
-              {/* Products Grid */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
+              {/* UPDATED GRID LOGIC: 
+                  1 col on mobile (will fill width if alone)
+                  2 cols on small tablets (sm:)
+                  4 cols on large screens (lg:) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
                 {loading
                   ? Array.from({ length: 4 }).map((_, i) => (
                       <OfertaSkeleton key={i} />
@@ -162,7 +163,7 @@ export default function Index() {
                     ))}
               </div>
 
-              {/* Footer Button: Shown only on mobile at the bottom */}
+              {/* Footer Button for mobile */}
               <div className="mt-8 md:hidden">
                 <Link
                   to="/tienda"
@@ -176,20 +177,6 @@ export default function Index() {
           </div>
         </section>
       )}
-
-      {/* About Section */}
-      <section className="py-20 md:py-32 bg-card">
-        <div className="container mx-auto px-4 text-center max-w-3xl">
-          <h2 className="font-display text-3xl md:text-5xl font-bold text-foreground mb-6">
-            Nuestra <span className="text-primary">Historia</span>
-          </h2>
-          <p className="text-lg text-muted-foreground leading-relaxed mb-8">
-            Puesto de Campo nace de la pasión por la carne argentina de calidad.
-            Somos una empresa familiar dedicada a llevar los mejores cortes
-            directamente del productor a tu hogar.
-          </p>
-        </div>
-      </section>
 
       {/* Features Section */}
       <section className="py-20 md:py-32 bg-background">
@@ -233,11 +220,10 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Back to Top */}
       {showScrollTop && (
         <button
           onClick={scrollToTop}
-          className="fixed bottom-8 right-6 z-50 p-4 bg-primary text-primary-foreground rounded-full shadow-2xl hover:scale-110 transition-all duration-300 animate-in fade-in zoom-in"
+          className="fixed bottom-8 right-6 z-50 p-4 bg-primary text-primary-foreground rounded-full shadow-2xl hover:scale-110 transition-all duration-300"
           aria-label="Volver arriba"
         >
           <ArrowUp size={24} />
