@@ -255,7 +255,7 @@ export function CartDrawer() {
                 />
               </div>
 
-              {/* FIELD: LOGISTICS */}
+              {/* LOGISTICS */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label className="text-xs font-bold text-muted-foreground">
