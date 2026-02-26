@@ -232,7 +232,7 @@ export function CartDrawer() {
               >
                 <Label
                   htmlFor="name"
-                  className="flex justify-between font-bold mb-2"
+                  className="flex justify-between font-bold mb-1"
                 >
                   Nombre del cliente{" "}
                   {errors.name && touched && (
@@ -241,6 +241,9 @@ export function CartDrawer() {
                     </span>
                   )}
                 </Label>
+                <p className="text-[11px] text-muted-foreground mb-2">
+                  Ingresá tu nombre para que sepamos quién hace el pedido.
+                </p>
                 <Input
                   id="name"
                   placeholder="Ej: Juan Pérez"
@@ -299,7 +302,7 @@ export function CartDrawer() {
               >
                 {shippingMethod === "delivery" ? (
                   <>
-                    <Label className="flex justify-between font-bold mb-2">
+                    <Label className="flex justify-between font-bold mb-1">
                       Dirección de envío{" "}
                       {errors.address && touched && (
                         <span className="text-red-500 text-[10px] uppercase tracking-widest">
@@ -307,6 +310,9 @@ export function CartDrawer() {
                         </span>
                       )}
                     </Label>
+                    <p className="text-[11px] text-muted-foreground mb-2">
+                      Incluí calle, número y cualquier referencia útil.
+                    </p>
                     <Input
                       placeholder="Calle, nro, piso/depto..."
                       className={cn(
@@ -321,7 +327,7 @@ export function CartDrawer() {
                   </>
                 ) : (
                   <>
-                    <Label className="flex justify-between font-bold mb-2">
+                    <Label className="flex justify-between font-bold mb-1">
                       Punto de retiro{" "}
                       {errors.branch && touched && (
                         <span className="text-red-500 text-[10px] uppercase tracking-widest">
@@ -329,6 +335,9 @@ export function CartDrawer() {
                         </span>
                       )}
                     </Label>
+                    <p className="text-[11px] text-muted-foreground mb-2">
+                      Seleccioná la sucursal donde retirarás tus productos.
+                    </p>
                     <select
                       className={cn(
                         "flex h-11 w-full rounded-md border bg-background px-3 py-2 text-sm",
