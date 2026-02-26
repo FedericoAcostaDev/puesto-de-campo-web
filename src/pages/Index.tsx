@@ -1,32 +1,35 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowRight, Beef, Award, Truck, Users, ArrowUp } from 'lucide-react';
-import { Layout } from '@/components/layout/Layout';
-import { ProductCard } from '@/components/store/ProductCard';
-import { useProducts } from '@/hooks/useProducts';
-import heroImage from '@/assets/hero-meat.jpg';
-import logo from '@/assets/logo.jpg';
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { ArrowRight, Beef, Award, Truck, Users, ArrowUp } from "lucide-react";
+import { Layout } from "@/components/layout/Layout";
+import { ProductCard } from "@/components/store/ProductCard";
+import { useProducts } from "@/hooks/useProducts";
+import heroImage from "@/assets/hero-meat.jpg";
+import logo from "@/assets/logo.jpg";
 
 const features = [
   {
     icon: Beef,
-    title: 'Cortes Premium',
-    description: 'Seleccionamos los mejores cortes de carne argentina, madurada naturalmente.',
+    title: "Cortes Premium",
+    description:
+      "Seleccionamos los mejores cortes de carne argentina, madurada naturalmente.",
   },
   {
     icon: Award,
-    title: 'Calidad Garantizada',
-    description: 'Cada pieza pasa por rigurosos controles de calidad para asegurar la excelencia.',
+    title: "Calidad Garantizada",
+    description:
+      "Cada pieza pasa por rigurosos controles de calidad para asegurar la excelencia.",
   },
   {
     icon: Truck,
-    title: 'Entrega a Domicilio',
-    description: 'Llevamos el sabor del campo directamente a tu puerta.',
+    title: "Entrega a Domicilio",
+    description: "Llevamos el sabor del campo directamente a tu puerta.",
   },
   {
     icon: Users,
-    title: 'Tradición Familiar',
-    description: 'Más de 5 años de experiencia compartiendo el verdadero sabor de la carne.',
+    title: "Tradición Familiar",
+    description:
+      "Más de 5 años de experiencia compartiendo el verdadero sabor de la carne.",
   },
 ];
 
@@ -42,32 +45,42 @@ const OfertaSkeleton = () => (
 
 export default function Index() {
   const { products, loading } = useProducts();
-  
+
   const ofertas = products.filter(
-    (p) => p.category?.toLowerCase() === 'ofertas'
+    (p) => p.category?.toLowerCase() === "ofertas",
   );
 
   const [showScrollTop, setShowScrollTop] = useState(false);
 
+  // CHANGE: Ensure the page starts at the top when mounted
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  // Scroll listener for the "Back to Top" button visibility
   useEffect(() => {
     const handleScroll = () => {
       setShowScrollTop(window.scrollY > 500);
     };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
     <Layout>
       {/* Estilos locales para ocultar scrollbar del carrusel */}
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-      `}} />
+      `,
+        }}
+      />
 
       {/* Hero Section */}
       <section className="relative min-h-[90vh] flex items-center justify-center texture-overlay">
@@ -82,22 +95,32 @@ export default function Index() {
 
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-2xl animate-slide-up">
-            <img src={logo} alt="Puesto de Campo" className="h-24 md:h-32 mb-8" />
+            <img
+              src={logo}
+              alt="Puesto de Campo"
+              className="h-24 md:h-32 mb-8"
+            />
             <h1 className="font-display text-4xl md:text-6xl font-bold text-foreground mb-6 leading-tight">
               El Sabor Natural
               <br />
               <span className="text-primary">de la Carne</span>
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground mb-8 leading-relaxed">
-              Descubrí la calidad premium de nuestros cortes argentinos. 
-              Del campo a tu mesa, con la frescura y el sabor que mereces.
+              Descubrí la calidad premium de nuestros cortes argentinos. Del
+              campo a tu mesa, con la frescura y el sabor que mereces.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link to="/tienda" className="btn-primary-custom rounded-lg inline-flex items-center justify-center gap-2 px-6 py-3">
+              <Link
+                to="/tienda"
+                className="btn-primary-custom rounded-lg inline-flex items-center justify-center gap-2 px-6 py-3"
+              >
                 Ver Productos
                 <ArrowRight className="h-4 w-4" />
               </Link>
-              <Link to="/contacto" className="btn-outline-custom rounded-lg inline-flex items-center justify-center px-6 py-3">
+              <Link
+                to="/contacto"
+                className="btn-outline-custom rounded-lg inline-flex items-center justify-center px-6 py-3"
+              >
                 Contactanos
               </Link>
             </div>
@@ -114,22 +137,27 @@ export default function Index() {
                 <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground">
                   Ofertas <span className="text-primary">Especiales</span>
                 </h2>
-                <p className="text-muted-foreground mt-2">Aprovechá estas promociones.</p>
+                <p className="text-muted-foreground mt-2">
+                  Aprovechá estas promociones.
+                </p>
               </div>
-              
-              <Link to="/tienda" className="flex items-center gap-2 text-primary hover:underline font-medium text-sm md:text-base">
+
+              <Link
+                to="/tienda"
+                className="flex items-center gap-2 text-primary hover:underline font-medium text-sm md:text-base"
+              >
                 Tienda <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
-              {loading ? (
-                Array.from({ length: 4 }).map((_, i) => <OfertaSkeleton key={i} />)
-              ) : (
-                ofertas.map((product) => (
-                  <ProductCard key={product.id} product={product} />
-                ))
-              )}
+              {loading
+                ? Array.from({ length: 4 }).map((_, i) => (
+                    <OfertaSkeleton key={i} />
+                  ))
+                : ofertas.map((product) => (
+                    <ProductCard key={product.id} product={product} />
+                  ))}
             </div>
           </div>
         </section>
@@ -142,20 +170,20 @@ export default function Index() {
             Nuestra <span className="text-primary">Historia</span>
           </h2>
           <p className="text-lg text-muted-foreground leading-relaxed mb-8">
-            Puesto de Campo nace de la pasión por la carne argentina de calidad. 
-            Somos una empresa familiar dedicada a llevar los mejores cortes directamente del productor a tu hogar.
+            Puesto de Campo nace de la pasión por la carne argentina de calidad.
+            Somos una empresa familiar dedicada a llevar los mejores cortes
+            directamente del productor a tu hogar.
           </p>
         </div>
       </section>
 
-      {/* Features Section - AHORA CON CARRUSEL EN MOBILE */}
+      {/* Features Section */}
       <section className="py-20 md:py-32 bg-background">
         <div className="container mx-auto px-4">
           <h2 className="font-display text-3xl md:text-5xl font-bold text-center text-foreground mb-16">
             ¿Por qué <span className="text-primary">elegirnos</span>?
           </h2>
-          
-          {/* Contenedor: Flex lateral en mobile con snap, Grid en desktop */}
+
           <div className="flex overflow-x-auto pb-8 md:pb-0 md:grid md:grid-cols-2 lg:grid-cols-4 gap-6 snap-x snap-mandatory hide-scrollbar">
             {features.map((feature, index) => (
               <div
@@ -168,14 +196,11 @@ export default function Index() {
                 <h3 className="font-display text-xl font-semibold text-foreground mb-2">
                   {feature.title}
                 </h3>
-                <p className="text-muted-foreground">
-                  {feature.description}
-                </p>
+                <p className="text-muted-foreground">{feature.description}</p>
               </div>
             ))}
           </div>
 
-          {/* Indicadores visuales (solo visibles en móvil) */}
           <div className="flex justify-center gap-2 mt-4 md:hidden">
             {features.map((_, i) => (
               <div key={i} className="h-1.5 w-1.5 rounded-full bg-primary/30" />

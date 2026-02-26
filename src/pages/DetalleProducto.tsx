@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useCart } from "@/contexts/CartContext";
@@ -12,6 +13,11 @@ const DetalleProducto = () => {
   const navigate = useNavigate();
   const { addToCart } = useCart();
 
+  // FIX: Scroll to top automatically when the page opens
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [id]);
+
   const { data: products, isLoading } = useQuery({
     queryKey: ["products"],
     queryFn: getProducts,
@@ -19,9 +25,14 @@ const DetalleProducto = () => {
 
   const product = products?.find((p) => p.id === id);
 
+  /**
+   * Generates the fire spark effect at the click/tap location
+   */
   const triggerFireEffect = (e: React.MouseEvent | React.TouchEvent) => {
     const particleCount = 12;
     const colors = ["#ff4500", "#ff8c00", "#ffd700", "#ffffff"];
+
+    // Logic to handle both Mouse and Touch coordinates
     const clientX =
       "touches" in e ? e.touches[0].clientX : (e as React.MouseEvent).clientX;
     const clientY =
@@ -31,6 +42,7 @@ const DetalleProducto = () => {
       const particle = document.createElement("span");
       const size = Math.random() * 8 + 4 + "px";
       const color = colors[Math.floor(Math.random() * colors.length)];
+
       Object.assign(particle.style, {
         width: size,
         height: size,
@@ -147,6 +159,7 @@ const DetalleProducto = () => {
                 </p>
               </div>
 
+              {/* Price and Weight Badge */}
               <div className="flex items-center justify-between md:justify-start gap-6 bg-muted/30 p-4 rounded-2xl md:bg-transparent md:p-0">
                 <div className="flex flex-col">
                   <span className="text-xs text-muted-foreground uppercase font-semibold tracking-wider">
@@ -167,7 +180,7 @@ const DetalleProducto = () => {
                 </div>
               </div>
 
-              {/* Desktop Button */}
+              {/* Desktop Button (Hidden on Mobile) */}
               <div className="hidden md:block pt-4">
                 <Button
                   onClick={handleAddToCart}
@@ -179,7 +192,7 @@ const DetalleProducto = () => {
                 </Button>
               </div>
 
-              {/* Value Props */}
+              {/* Value Props / Trust Icons */}
               <div className="grid grid-cols-2 gap-4 pt-8 border-t border-border">
                 <div className="flex items-center space-x-3 group">
                   <div className="p-3 bg-primary/5 rounded-xl text-primary group-hover:bg-primary group-hover:text-white transition-colors">
@@ -206,7 +219,7 @@ const DetalleProducto = () => {
           </div>
         </div>
 
-        {/* Mobile Sticky Action Bar */}
+        {/* Mobile Sticky Action Bar - Always visible on small screens */}
         <div className="md:hidden fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-xl border-t border-border z-50 animate-in slide-in-from-bottom duration-500">
           <div className="max-w-md mx-auto flex items-center gap-4">
             <div className="flex-1">
