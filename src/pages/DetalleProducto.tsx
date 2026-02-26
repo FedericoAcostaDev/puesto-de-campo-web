@@ -13,7 +13,7 @@ const DetalleProducto = () => {
   const navigate = useNavigate();
   const { addToCart } = useCart();
 
-  // FIX: Scroll to top automatically when the page opens
+  // Scroll to top automatically when the page opens
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [id]);
@@ -26,9 +26,10 @@ const DetalleProducto = () => {
   const product = products?.find((p) => p.id === id);
 
   /**
-   * Helper to trigger haptic feedback
+   * Helper to trigger subtle haptic feedback
+   * 15ms feels like a high-end mechanical "tick"
    */
-  const triggerVibration = (ms = 40) => {
+  const triggerVibration = (ms = 15) => {
     if (
       typeof window !== "undefined" &&
       window.navigator &&
@@ -95,7 +96,7 @@ const DetalleProducto = () => {
 
   const handleAddToCart = (e: React.MouseEvent | React.TouchEvent) => {
     if (product) {
-      triggerVibration(40); // <--- Haptic feedback added here
+      triggerVibration(15); // Subtle haptic tick
       triggerFireEffect(e);
       addToCart(product);
       toast.success(`${product.name} agregado`);
@@ -138,8 +139,12 @@ const DetalleProducto = () => {
     <Layout>
       <div className="min-h-screen w-full bg-background animate-in fade-in duration-500">
         <div className="max-w-7xl mx-auto px-4 py-6 md:py-20 pb-32 md:pb-20">
+          {/* Back Button with haptic feel */}
           <button
-            onClick={() => navigate(-1)}
+            onClick={() => {
+              triggerVibration(10);
+              navigate(-1);
+            }}
             className="flex items-center text-muted-foreground hover:text-primary transition-colors mb-6 group w-fit"
           >
             <ArrowLeft className="h-4 w-4 mr-2 group-hover:-translate-x-1 transition-transform" />
@@ -147,6 +152,7 @@ const DetalleProducto = () => {
           </button>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-start">
+            {/* Image Section */}
             <div className="relative aspect-square rounded-[2rem] overflow-hidden bg-muted shadow-2xl border border-border group">
               <img
                 src={product.image}
@@ -156,6 +162,7 @@ const DetalleProducto = () => {
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
 
+            {/* Info Section */}
             <div className="flex flex-col space-y-6 md:space-y-8">
               <div className="space-y-3 md:space-y-4">
                 <span className="inline-flex px-3 py-1 rounded-full bg-primary/10 text-primary text-[10px] md:text-xs font-bold uppercase tracking-[0.2em]">
@@ -169,6 +176,7 @@ const DetalleProducto = () => {
                 </p>
               </div>
 
+              {/* Price and Weight */}
               <div className="flex items-center justify-between md:justify-start gap-6 bg-muted/30 p-4 rounded-2xl md:bg-transparent md:p-0">
                 <div className="flex flex-col">
                   <span className="text-xs text-muted-foreground uppercase font-semibold tracking-wider">
@@ -189,6 +197,7 @@ const DetalleProducto = () => {
                 </div>
               </div>
 
+              {/* Desktop Add Button */}
               <div className="hidden md:block pt-4">
                 <Button
                   onClick={handleAddToCart}
@@ -200,6 +209,7 @@ const DetalleProducto = () => {
                 </Button>
               </div>
 
+              {/* Trust Badges */}
               <div className="grid grid-cols-2 gap-4 pt-8 border-t border-border">
                 <div className="flex items-center space-x-3 group">
                   <div className="p-3 bg-primary/5 rounded-xl text-primary group-hover:bg-primary group-hover:text-white transition-colors">
@@ -226,6 +236,7 @@ const DetalleProducto = () => {
           </div>
         </div>
 
+        {/* Mobile Sticky Action Bar */}
         <div className="md:hidden fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-xl border-t border-border z-50 animate-in slide-in-from-bottom duration-500">
           <div className="max-w-md mx-auto flex items-center gap-4">
             <div className="flex-1">
