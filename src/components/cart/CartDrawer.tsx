@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import {
-  X,
   Minus,
   Plus,
   ShoppingBag,
@@ -8,7 +7,7 @@ import {
   ArrowLeft,
   MessageCircle,
   CheckCircle2,
-  AlertCircle, // New icon for warnings
+  AlertCircle,
 } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import {
@@ -22,7 +21,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { cn } from "@/lib/utils"; // Assuming you have shadcn's cn helper
+import { cn } from "@/lib/utils";
 
 const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER;
 
@@ -30,7 +29,7 @@ export function CartDrawer() {
   const [step, setStep] = useState<"cart" | "checkout">("cart");
   const [shippingMethod, setShippingMethod] = useState("delivery");
   const [isSuccess, setIsSuccess] = useState(false);
-  const [touched, setTouched] = useState(false); // Track if user tried to submit
+  const [touched, setTouched] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -51,7 +50,7 @@ export function CartDrawer() {
     clearCart,
   } = useCart();
 
-  // Logic to determine errors
+  // Validation Logic
   const errors = {
     name: formData.name.trim() === "",
     address: shippingMethod === "delivery" && formData.address.trim() === "",
@@ -65,17 +64,10 @@ export function CartDrawer() {
     if (savedData) {
       try {
         const parsed = JSON.parse(savedData);
-        setFormData({
-          name: parsed.name || "",
-          receiver: parsed.receiver || "",
-          paymentMethod: parsed.paymentMethod || "Efectivo",
-          address: parsed.address || "",
-          branch: parsed.branch || "",
-          notes: parsed.notes || "",
-        });
+        setFormData((prev) => ({ ...prev, ...parsed }));
         if (parsed.shippingMethod) setShippingMethod(parsed.shippingMethod);
       } catch (e) {
-        console.error("Error al cargar LocalStorage", e);
+        console.error("Error loading local storage", e);
       }
     }
   }, []);
@@ -87,24 +79,6 @@ export function CartDrawer() {
       "puesto-de-campo-customer",
       JSON.stringify({ ...newData, shippingMethod }),
     );
-  };
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("es-AR", {
-      style: "currency",
-      currency: "ARS",
-    }).format(price);
-  };
-
-  const handleOpenChange = (open: boolean) => {
-    setIsCartOpen(open);
-    if (!open) {
-      setTimeout(() => {
-        setStep("cart");
-        setIsSuccess(false);
-        setTouched(false);
-      }, 300);
-    }
   };
 
   const handleWhatsAppOrder = () => {
@@ -128,16 +102,15 @@ export function CartDrawer() {
 
     message += `\n*PRODUCTOS:*\n`;
     items.forEach((item) => {
-      message += `• ${item.quantity}x ${item.name} - ${formatPrice(item.price * item.quantity)}\n`;
+      message += `• ${item.quantity}x ${item.name} - $${(item.price * item.quantity).toLocaleString("es-AR")}\n`;
     });
 
     message += `\n--------------------------------\n`;
-    message += `💰 *TOTAL ESTIMADO: ${formatPrice(totalPrice)}*`;
+    message += `💰 *TOTAL ESTIMADO: $${totalPrice.toLocaleString("es-AR")}*`;
 
     setIsSuccess(true);
-    const encodedMessage = encodeURIComponent(message);
     window.open(
-      `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`,
+      `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`,
       "_blank",
     );
 
@@ -151,335 +124,306 @@ export function CartDrawer() {
   };
 
   return (
-    <Sheet open={isCartOpen} onOpenChange={handleOpenChange}>
-      <SheetContent className="w-full sm:max-w-md bg-card border-border flex flex-col p-0 overflow-hidden">
-        {/* SUCCESS OVERLAY */}
+    <Sheet
+      open={isCartOpen}
+      onOpenChange={(open) => {
+        setIsCartOpen(open);
+        if (!open) {
+          setStep("cart");
+          setTouched(false);
+        }
+      }}
+    >
+      <SheetContent className="w-full sm:max-w-md bg-card flex flex-col p-0">
         {isSuccess && (
           <div className="absolute inset-0 z-50 bg-background/95 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center animate-in fade-in duration-300">
-            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-4 animate-in zoom-in duration-500 delay-150">
-              <CheckCircle2 className="h-10 w-10 text-green-600" />
-            </div>
-            <h3 className="text-2xl font-bold text-foreground font-display">
+            <CheckCircle2 className="h-16 w-16 text-green-600 mb-4 animate-bounce" />
+            <h3 className="text-2xl font-bold font-display">
               ¡Pedido Enviado!
             </h3>
             <p className="text-muted-foreground mt-2">
-              Te estamos redirigiendo a WhatsApp...
+              Redirigiendo a WhatsApp...
             </p>
           </div>
         )}
 
-        <SheetHeader className="p-6 pb-2">
+        <SheetHeader className="p-6 pb-2 border-b border-border/50">
           <SheetTitle className="font-display text-xl flex items-center gap-2">
             {step === "checkout" && (
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8"
                 onClick={() => setStep("cart")}
+                className="h-8 w-8 mr-1"
               >
                 <ArrowLeft className="h-5 w-5" />
               </Button>
             )}
-            <ShoppingBag className="h-5 w-5" />
-            {step === "cart" ? "Tu Carrito" : "Datos de Entrega"}
+            <ShoppingBag className="h-5 w-5 text-primary" />
+            {step === "cart" ? "Tu Carrito" : "Finalizar Pedido"}
           </SheetTitle>
         </SheetHeader>
 
-        {items.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-[60vh] text-muted-foreground px-6">
-            <ShoppingBag className="h-16 w-16 mb-4 opacity-20" />
-            <p className="text-lg font-medium">Tu carrito está vacío</p>
-            <Button variant="link" onClick={() => setIsCartOpen(false)}>
-              Empezar a comprar
-            </Button>
-          </div>
-        ) : (
-          <>
-            <ScrollArea className="flex-1 px-6">
-              {step === "cart" ? (
-                <div className="flex flex-col gap-4 py-4">
-                  {items.map((item) => (
-                    <div
-                      key={item.id}
-                      className="flex gap-4 p-3 bg-secondary/50 rounded-xl border border-border/40"
-                    >
-                      <div className="w-20 h-20 bg-muted rounded-lg overflow-hidden shrink-0">
-                        <img
-                          src={item.image}
-                          alt={item.name}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <div className="flex flex-col justify-between flex-1">
-                        <div>
-                          <h4 className="font-medium text-sm mb-1">
-                            {item.name}
-                          </h4>
-                          <p className="text-primary font-bold">
-                            {formatPrice(item.price)}
-                          </p>
-                        </div>
-                        <div className="flex items-center justify-between mt-2">
-                          <div className="flex items-center gap-2 bg-background rounded-md border border-border p-1">
-                            <button
-                              onClick={() =>
-                                updateQuantity(item.id, item.quantity - 1)
-                              }
-                              className="p-1 hover:text-primary"
-                            >
-                              <Minus className="h-3 w-3" />
-                            </button>
-                            <span className="w-6 text-center text-xs font-bold">
-                              {item.quantity}
-                            </span>
-                            <button
-                              onClick={() =>
-                                updateQuantity(item.id, item.quantity + 1)
-                              }
-                              className="p-1 hover:text-primary"
-                            >
-                              <Plus className="h-3 w-3" />
-                            </button>
-                          </div>
-                          <button
-                            onClick={() => removeFromCart(item.id)}
-                            className="text-muted-foreground hover:text-destructive transition-colors"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="space-y-6 py-4">
-                  {/* NAME FIELD */}
-                  <div
-                    className={cn(
-                      "space-y-2 p-4 rounded-xl border transition-all duration-300",
-                      errors.name && touched
-                        ? "bg-destructive/5 border-destructive"
-                        : "bg-primary/5 border-primary/10",
-                    )}
-                  >
-                    <Label
-                      htmlFor="name"
-                      className="text-sm font-bold flex items-center justify-between"
-                    >
-                      Nombre de quien compra
-                      <span className="text-destructive">* Requerido</span>
-                    </Label>
-                    <Input
-                      id="name"
-                      placeholder="Ej: Juan Pérez"
-                      className={cn(
-                        "bg-background h-11 transition-all",
-                        errors.name && touched
-                          ? "border-destructive focus-visible:ring-destructive"
-                          : "border-primary/20",
-                      )}
-                      value={formData.name}
-                      onChange={(e) => updateFormData({ name: e.target.value })}
-                    />
-                    {errors.name && touched && (
-                      <p className="text-xs text-destructive font-semibold flex items-center gap-1 animate-in slide-in-from-top-1">
-                        <AlertCircle className="h-3 w-3" /> Por favor, ingresa
-                        tu nombre
+        <ScrollArea className="flex-1 px-6">
+          {step === "cart" ? (
+            <div className="space-y-4 py-6">
+              {items.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex gap-4 p-3 bg-secondary/30 rounded-2xl border border-border/40"
+                >
+                  <img
+                    src={item.image}
+                    className="w-20 h-20 rounded-lg object-cover bg-muted"
+                    alt={item.name}
+                  />
+                  <div className="flex-1 flex flex-col justify-between">
+                    <div>
+                      <h4 className="font-bold text-sm leading-tight">
+                        {item.name}
+                      </h4>
+                      <p className="text-primary font-bold text-sm">
+                        ${item.price.toLocaleString("es-AR")}
                       </p>
-                    )}
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4 px-1">
-                    <div className="space-y-2">
-                      <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                        Tipo de entrega
-                      </Label>
-                      <select
-                        className="flex h-11 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                        value={shippingMethod}
-                        onChange={(e) => setShippingMethod(e.target.value)}
-                      >
-                        <option value="delivery">Envío a domicilio</option>
-                        <option value="pickup">Retiro en local</option>
-                      </select>
                     </div>
-                    <div className="space-y-2">
-                      <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                        Forma de pago
-                      </Label>
-                      <select
-                        className="flex h-11 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                        value={formData.paymentMethod}
-                        onChange={(e) =>
-                          updateFormData({ paymentMethod: e.target.value })
-                        }
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 bg-background border rounded-lg p-1">
+                        <button
+                          onClick={() =>
+                            updateQuantity(item.id, item.quantity - 1)
+                          }
+                          className="p-1"
+                        >
+                          <Minus className="h-3 w-3" />
+                        </button>
+                        <span className="text-xs font-bold w-4 text-center">
+                          {item.quantity}
+                        </span>
+                        <button
+                          onClick={() =>
+                            updateQuantity(item.id, item.quantity + 1)
+                          }
+                          className="p-1"
+                        >
+                          <Plus className="h-3 w-3" />
+                        </button>
+                      </div>
+                      <button
+                        onClick={() => removeFromCart(item.id)}
+                        className="text-muted-foreground hover:text-destructive"
                       >
-                        <option value="Efectivo">Efectivo</option>
-                        <option value="Transferencia">Transferencia</option>
-                        <option value="Mercado Pago">Mercado Pago</option>
-                      </select>
+                        <Trash2 className="h-4 w-4" />
+                      </button>
                     </div>
-                  </div>
-
-                  {/* DYNAMIC FIELD (ADDRESS OR BRANCH) */}
-                  <div
-                    className={cn(
-                      "space-y-2 p-4 rounded-xl border transition-all duration-300",
-                      (errors.address || errors.branch) && touched
-                        ? "bg-destructive/5 border-destructive"
-                        : "bg-secondary/30 border-border",
-                    )}
-                  >
-                    {shippingMethod === "delivery" ? (
-                      <>
-                        <Label
-                          htmlFor="address"
-                          className="text-sm font-bold flex items-center justify-between"
-                        >
-                          Dirección de envío
-                          <span className="text-destructive">* Requerido</span>
-                        </Label>
-                        <Input
-                          id="address"
-                          placeholder="Calle, número, depto..."
-                          className={cn(
-                            "bg-background h-11",
-                            errors.address && touched
-                              ? "border-destructive focus-visible:ring-destructive"
-                              : "border-border",
-                          )}
-                          value={formData.address}
-                          onChange={(e) =>
-                            updateFormData({ address: e.target.value })
-                          }
-                        />
-                        {errors.address && touched && (
-                          <p className="text-xs text-destructive font-semibold flex items-center gap-1 animate-in slide-in-from-top-1">
-                            <AlertCircle className="h-3 w-3" /> Indica dónde
-                            debemos entregarlo
-                          </p>
-                        )}
-                      </>
-                    ) : (
-                      <>
-                        <Label
-                          htmlFor="branch"
-                          className="text-sm font-bold flex items-center justify-between"
-                        >
-                          Selecciona la sucursal
-                          <span className="text-destructive">* Requerido</span>
-                        </Label>
-                        <select
-                          id="branch"
-                          className={cn(
-                            "flex h-11 w-full rounded-md border bg-background px-3 py-2 text-sm",
-                            errors.branch && touched
-                              ? "border-destructive"
-                              : "border-border",
-                          )}
-                          value={formData.branch}
-                          onChange={(e) =>
-                            updateFormData({ branch: e.target.value })
-                          }
-                        >
-                          <option value="">Elegir sucursal...</option>
-                          <option value="Sucursal Centro">
-                            Centro (Av. Colón 123)
-                          </option>
-                          <option value="Sucursal Norte">
-                            Norte (Calle Ficticia 456)
-                          </option>
-                        </select>
-                        {errors.branch && touched && (
-                          <p className="text-xs text-destructive font-semibold flex items-center gap-1 animate-in slide-in-from-top-1">
-                            <AlertCircle className="h-3 w-3" /> Debes elegir una
-                            sucursal para retirar
-                          </p>
-                        )}
-                      </>
-                    )}
-                  </div>
-
-                  <div className="space-y-2 px-1">
-                    <Label htmlFor="receiver">¿Quién recibe? (opcional)</Label>
-                    <Input
-                      id="receiver"
-                      placeholder="Nombre de la persona"
-                      className="bg-background h-11"
-                      value={formData.receiver}
-                      onChange={(e) =>
-                        updateFormData({ receiver: e.target.value })
-                      }
-                    />
-                  </div>
-
-                  <div className="space-y-2 px-1">
-                    <Label>Notas o referencias</Label>
-                    <Textarea
-                      placeholder="Ej: Portón negro, tocar timbre fuerte..."
-                      maxLength={70}
-                      className="resize-none h-20 bg-background"
-                      value={formData.notes}
-                      onChange={(e) =>
-                        updateFormData({ notes: e.target.value })
-                      }
-                    />
-                    <p className="text-[10px] text-right text-muted-foreground">
-                      {formData.notes.length}/70
-                    </p>
                   </div>
                 </div>
-              )}
-            </ScrollArea>
-
-            <div className="mt-auto p-6 bg-background border-t border-border space-y-4">
-              <div className="flex items-center justify-between text-lg">
-                <span className="font-medium">Total estimado</span>
-                <span className="font-display font-bold text-primary text-xl">
-                  {formatPrice(totalPrice)}
-                </span>
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-6 py-6">
+              {/* FIELD: NAME */}
+              <div
+                className={cn(
+                  "p-4 rounded-xl border transition-colors",
+                  errors.name && touched
+                    ? "bg-red-50/50 border-red-500 shadow-[0_0_10px_rgba(239,68,68,0.1)]"
+                    : "bg-primary/5 border-primary/10",
+                )}
+              >
+                <Label
+                  htmlFor="name"
+                  className="flex justify-between font-bold mb-2"
+                >
+                  Nombre del cliente{" "}
+                  {errors.name && touched && (
+                    <span className="text-red-500 text-[10px] uppercase tracking-widest">
+                      Obligatorio
+                    </span>
+                  )}
+                </Label>
+                <Input
+                  id="name"
+                  placeholder="Ej: Juan Pérez"
+                  className={cn(
+                    "bg-background h-11",
+                    errors.name &&
+                      touched &&
+                      "border-red-500 focus-visible:ring-red-500",
+                  )}
+                  value={formData.name}
+                  onChange={(e) => updateFormData({ name: e.target.value })}
+                />
               </div>
 
-              {step === "cart" ? (
-                <div className="flex flex-col gap-2">
-                  <Button
-                    className="w-full h-12 text-md font-bold rounded-xl"
-                    onClick={() => setStep("checkout")}
+              {/* FIELD: LOGISTICS */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-xs font-bold text-muted-foreground">
+                    MODALIDAD
+                  </Label>
+                  <select
+                    className="flex h-11 w-full rounded-md border bg-background px-3 py-2 text-sm"
+                    value={shippingMethod}
+                    onChange={(e) => setShippingMethod(e.target.value)}
                   >
-                    Confirmar Pedido
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    onClick={clearCart}
-                    className="text-muted-foreground text-xs hover:text-destructive"
-                  >
-                    Vaciar mi carrito
-                  </Button>
+                    <option value="delivery">📍 Domicilio</option>
+                    <option value="pickup">🏠 Retiro</option>
+                  </select>
                 </div>
-              ) : (
-                <Button
-                  className={cn(
-                    "w-full h-14 text-md font-bold rounded-xl flex gap-2 items-center transition-all",
-                    isFormValid
-                      ? "bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-200"
-                      : "bg-muted text-muted-foreground cursor-not-allowed opacity-70",
-                  )}
-                  onClick={handleWhatsAppOrder}
-                  // We handle the "touched" state on click if it's invalid
-                  onMouseDown={() => {
-                    if (!isFormValid) setTouched(true);
-                  }}
-                >
-                  <MessageCircle className="h-5 w-5" />
-                  {isFormValid
-                    ? "Enviar pedido por WhatsApp"
-                    : "Completa los campos (*) para continuar"}
-                </Button>
-              )}
+                <div className="space-y-2">
+                  <Label className="text-xs font-bold text-muted-foreground">
+                    PAGO
+                  </Label>
+                  <select
+                    className="flex h-11 w-full rounded-md border bg-background px-3 py-2 text-sm"
+                    value={formData.paymentMethod}
+                    onChange={(e) =>
+                      updateFormData({ paymentMethod: e.target.value })
+                    }
+                  >
+                    <option value="Efectivo">Efectivo</option>
+                    <option value="Transferencia">Transferencia</option>
+                    <option value="Mercado Pago">Mercado Pago</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* FIELD: ADDRESS OR BRANCH */}
+              <div
+                className={cn(
+                  "p-4 rounded-xl border transition-colors",
+                  (errors.address || errors.branch) && touched
+                    ? "bg-red-50/50 border-red-500"
+                    : "bg-secondary/30 border-border",
+                )}
+              >
+                {shippingMethod === "delivery" ? (
+                  <>
+                    <Label className="flex justify-between font-bold mb-2">
+                      Dirección de envío{" "}
+                      {errors.address && touched && (
+                        <span className="text-red-500 text-[10px] uppercase tracking-widest">
+                          Requerido
+                        </span>
+                      )}
+                    </Label>
+                    <Input
+                      placeholder="Calle, nro, piso/depto..."
+                      className={cn(
+                        "bg-background h-11",
+                        errors.address && touched && "border-red-500",
+                      )}
+                      value={formData.address}
+                      onChange={(e) =>
+                        updateFormData({ address: e.target.value })
+                      }
+                    />
+                  </>
+                ) : (
+                  <>
+                    <Label className="flex justify-between font-bold mb-2">
+                      Punto de retiro{" "}
+                      {errors.branch && touched && (
+                        <span className="text-red-500 text-[10px] uppercase tracking-widest">
+                          Elegí uno
+                        </span>
+                      )}
+                    </Label>
+                    <select
+                      className={cn(
+                        "flex h-11 w-full rounded-md border bg-background px-3 py-2 text-sm",
+                        errors.branch && touched && "border-red-500",
+                      )}
+                      value={formData.branch}
+                      onChange={(e) =>
+                        updateFormData({ branch: e.target.value })
+                      }
+                    >
+                      <option value="">Seleccionar sucursal...</option>
+                      <option value="Sucursal Centro">
+                        Centro (Av. Colón 123)
+                      </option>
+                      <option value="Sucursal Norte">
+                        Norte (Calle Ficticia 456)
+                      </option>
+                    </select>
+                  </>
+                )}
+                {(errors.address || errors.branch) && touched && (
+                  <p className="mt-2 text-xs text-red-600 font-medium flex items-center gap-1">
+                    <AlertCircle className="h-3 w-3" /> Por favor, completa la
+                    información de entrega.
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <Label className="text-sm font-semibold mb-2 block">
+                    ¿Quién recibe? (Opcional)
+                  </Label>
+                  <Input
+                    placeholder="Nombre de la persona"
+                    value={formData.receiver}
+                    onChange={(e) =>
+                      updateFormData({ receiver: e.target.value })
+                    }
+                  />
+                </div>
+                <div>
+                  <Label className="text-sm font-semibold mb-2 block">
+                    Notas extras
+                  </Label>
+                  <Textarea
+                    className="resize-none bg-background"
+                    placeholder="Ej: No funciona el timbre..."
+                    value={formData.notes}
+                    onChange={(e) => updateFormData({ notes: e.target.value })}
+                  />
+                </div>
+              </div>
             </div>
-          </>
-        )}
+          )}
+        </ScrollArea>
+
+        <div className="p-6 bg-background border-t border-border mt-auto">
+          <div className="flex justify-between items-center mb-6">
+            <span className="text-muted-foreground font-medium">
+              Subtotal estimado:
+            </span>
+            <span className="text-2xl font-bold text-primary font-display">
+              ${totalPrice.toLocaleString("es-AR")}
+            </span>
+          </div>
+
+          {step === "cart" ? (
+            <Button
+              className="w-full h-14 text-lg font-bold rounded-2xl shadow-lg"
+              onClick={() => setStep("checkout")}
+              disabled={items.length === 0}
+            >
+              Siguiente: Datos de envío
+            </Button>
+          ) : (
+            <Button
+              className={cn(
+                "w-full h-14 text-lg font-bold rounded-2xl flex gap-3 items-center shadow-lg transition-all",
+                isFormValid
+                  ? "bg-green-600 hover:bg-green-700 text-white"
+                  : "bg-muted text-muted-foreground opacity-70 grayscale",
+              )}
+              onClick={handleWhatsAppOrder}
+              onMouseDown={() => {
+                if (!isFormValid) setTouched(true);
+              }}
+            >
+              <MessageCircle className="h-6 w-6" />
+              {isFormValid
+                ? "Hacer pedido por WhatsApp"
+                : "Completa los campos marcados"}
+            </Button>
+          )}
+        </div>
       </SheetContent>
     </Sheet>
   );
