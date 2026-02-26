@@ -1,8 +1,8 @@
-import { useState, useEffect, useMemo } from 'react';
-import { Layout } from '@/components/layout/Layout';
-import { ProductCard } from '@/components/store/ProductCard';
-import { useProducts } from '@/hooks/useProducts'; // Tu nuevo hook estrella
-import { ArrowUp } from 'lucide-react'; 
+import { useState, useEffect, useMemo } from "react";
+import { Layout } from "@/components/layout/Layout";
+import { ProductCard } from "@/components/store/ProductCard";
+import { useProducts } from "@/hooks/useProducts";
+import { ArrowUp } from "lucide-react";
 
 const ProductSkeleton = () => (
   <div className="bg-card rounded-xl border border-border overflow-hidden animate-pulse">
@@ -19,36 +19,37 @@ const ProductSkeleton = () => (
 );
 
 export default function Tienda() {
-  // 1. Consumimos los productos desde React Query
   const { products, loading, isRefreshing } = useProducts();
-  
-  const [selectedCategory, setSelectedCategory] = useState('Todos');
+
+  const [selectedCategory, setSelectedCategory] = useState("Todos");
   const [showScrollTop, setShowScrollTop] = useState(false);
 
-  // 2. Calculamos las categorías dinámicamente basándonos en los productos
-  // Usamos useMemo para que solo se recalcule si 'products' cambia
+  // --- NEW: Scroll to top on Mount ---
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  // Lógica de Scroll para el botón flotante
+  useEffect(() => {
+    const handleScroll = () => setShowScrollTop(window.scrollY > 400);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
+
   const dynamicCategories = useMemo(() => {
-    if (!products.length) return ['Todos'];
+    if (!products.length) return ["Todos"];
     const rawCategories = products.map((p) => p.category);
     const uniqueCategories = Array.from(new Set(rawCategories)).filter(Boolean);
-    return ['Todos', ...uniqueCategories.sort()];
+    return ["Todos", ...uniqueCategories.sort()];
   }, [products]);
 
-  // 3. Filtramos los productos según la categoría seleccionada
   const filteredProducts = useMemo(() => {
-    return selectedCategory === 'Todos'
+    return selectedCategory === "Todos"
       ? products
       : products.filter((p) => p.category === selectedCategory);
   }, [selectedCategory, products]);
-
-  // Lógica de Scroll
-  useEffect(() => {
-    const handleScroll = () => setShowScrollTop(window.scrollY > 400);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
   return (
     <Layout>
@@ -59,7 +60,9 @@ export default function Tienda() {
             Nuestra <span className="text-primary">Tienda</span>
           </h1>
           {isRefreshing && (
-            <p className="text-xs text-primary animate-pulse">Actualizando stock en tiempo real...</p>
+            <p className="text-xs text-primary animate-pulse">
+              Actualizando stock en tiempo real...
+            </p>
           )}
         </div>
       </section>
@@ -67,7 +70,6 @@ export default function Tienda() {
       {/* Main Content */}
       <section className="py-12 bg-background relative">
         <div className="container mx-auto px-4">
-          
           {/* Categorías Dinámicas */}
           <div className="flex flex-wrap justify-center gap-2 md:gap-4 mb-12">
             {dynamicCategories.map((cat) => (
@@ -76,8 +78,8 @@ export default function Tienda() {
                 onClick={() => setSelectedCategory(cat)}
                 className={`px-4 py-2 md:px-6 md:py-2 rounded-full text-xs md:text-sm font-medium transition-all duration-300 ${
                   selectedCategory === cat
-                    ? 'bg-primary text-primary-foreground shadow-lg'
-                    : 'bg-card text-muted-foreground border border-border hover:border-primary'
+                    ? "bg-primary text-primary-foreground shadow-lg"
+                    : "bg-card text-muted-foreground border border-border hover:border-primary"
                 }`}
               >
                 {cat}
@@ -87,18 +89,20 @@ export default function Tienda() {
 
           {/* Grid de Productos */}
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6">
-            {loading ? (
-              Array.from({ length: 8 }).map((_, i) => <ProductSkeleton key={i} />)
-            ) : (
-              filteredProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))
-            )}
+            {loading
+              ? Array.from({ length: 8 }).map((_, i) => (
+                  <ProductSkeleton key={i} />
+                ))
+              : filteredProducts.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
           </div>
 
           {!loading && filteredProducts.length === 0 && (
             <div className="text-center py-20">
-              <p className="text-muted-foreground text-lg">No encontramos cortes en esta categoría.</p>
+              <p className="text-muted-foreground text-lg">
+                No encontramos cortes en esta categoría.
+              </p>
             </div>
           )}
         </div>
