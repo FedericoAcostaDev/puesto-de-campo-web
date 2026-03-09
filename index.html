@@ -15,21 +15,31 @@
 
     <meta
       property="og:title"
-      content="Puesto de Campo - El Sabor Natural de la Carne"
+      content="Puesto de Campo - Carnicería de Selección"
     />
     <meta
       property="og:description"
-      content="Carnes argentinas premium. Calidad y frescura del campo a tu mesa."
+      content="Disfrutá del sabor natural de la mejor carne argentina. Calidad premium directa del campo a tu mesa."
     />
     <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://puesto-de-campo-web.vercel.app" />
     <meta
-      property="og:url"
-      content="https://www.puesto-de-campo-web.vercel.app"
+      property="og:image"
+      content="https://puesto-de-campo-web.vercel.app/images/puesto-logo-seo.jpg"
     />
-    <meta property="og:image" content="/images/puesto-logo-seo.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@puestodecampo" />
-    <meta name="twitter:image" content="/images/puesto-logo-seo.jpg" />
+    <meta name="twitter:title" content="Puesto de Campo - Carnes Premium" />
+    <meta
+      name="twitter:description"
+      content="Cortes vacunos seleccionados y embutidos artesanales."
+    />
+    <meta
+      name="twitter:image"
+      content="https://puesto-de-campo-web.vercel.app/images/puesto-logo-seo.jpg"
+    />
 
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
 
@@ -38,39 +48,20 @@
         "@context": "https://schema.org",
         "@type": "ButcherShop",
         "name": "Puesto de Campo",
-        "image": "https://www.puestodecampo.com.ar/images/puesto-logo-seo.jpg",
-        "@id": "https://www.puestodecampo.com.ar",
-        "url": "https://www.puestodecampo.com.ar",
+        "image": "https://puesto-de-campo-web.vercel.app/images/puesto-logo-seo.jpg",
+        "url": "https://puesto-de-campo-web.vercel.app",
         "telephone": "+5411XXXXXXXX",
+        "priceRange": "$$",
         "address": {
           "@type": "PostalAddress",
           "streetAddress": "Tu Dirección 123",
           "addressLocality": "Tu Ciudad",
           "addressRegion": "Buenos Aires",
           "addressCountry": "AR"
-        },
-        "geo": {
-          "@type": "GeoCoordinates",
-          "latitude": -34.6037,
-          "longitude": -58.3816
-        },
-        "openingHoursSpecification": {
-          "@type": "OpeningHoursSpecification",
-          "dayOfWeek": [
-            "Monday",
-            "Tuesday",
-            "Wednesday",
-            "Thursday",
-            "Friday",
-            "Saturday"
-          ],
-          "opens": "09:00",
-          "closes": "20:00"
-        },
-        "priceRange": "$$"
+        }
       }
     </script>
-    <!-- Google Tag Manager -->
+
     <script>
       (function (w, d, s, l, i) {
         w[l] = w[l] || [];
@@ -83,11 +74,9 @@
         f.parentNode.insertBefore(j, f);
       })(window, document, "script", "dataLayer", "GTM-TPDWHGRL");
     </script>
-    <!-- End Google Tag Manager -->
   </head>
 
   <body>
-    <!-- Google Tag Manager (noscript) -->
     <noscript
       ><iframe
         src="https://www.googletagmanager.com/ns.html?id=GTM-TPDWHGRL"
@@ -96,22 +85,8 @@
         style="display: none; visibility: hidden"
       ></iframe
     ></noscript>
-    <!-- End Google Tag Manager (noscript) -->
-    <div id="root">
-      <header style="display: none">
-        <h1>Puesto de Campo - Carnicería de Selección</h1>
-        <p>
-          Expertos en cortes vacunos argentinos, embutidos artesanales y carnes
-          frescas premium.
-        </p>
-        <nav>
-          <ul>
-            <li><a href="/productos">Nuestros Cortes</a></li>
-            <li><a href="/contacto">Contacto y Pedidos</a></li>
-          </ul>
-        </nav>
-      </header>
-    </div>
+
+    <div id="root"></div>
 
     <script type="module" src="/src/main.tsx"></script>
   </body>
