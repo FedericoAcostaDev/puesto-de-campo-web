@@ -5,7 +5,7 @@ import { Layout } from "@/components/layout/Layout";
 import { ProductCard } from "@/components/store/ProductCard";
 import { useProducts } from "@/hooks/useProducts";
 import heroImage from "@/assets/hero-meat.jpg";
-import logo from "@/assets/logo.jpg";
+import logo from "@/assets/logo.jpeg";
 
 const features = [
   {
