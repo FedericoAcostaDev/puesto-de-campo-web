@@ -13,6 +13,8 @@
     <meta name="author" content="Puesto de Campo" />
     <meta name="robots" content="index, follow" />
 
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://puesto-de-campo-web.vercel.app/" />
     <meta
       property="og:title"
       content="Puesto de Campo - Carnicería de Selección"
@@ -21,12 +23,15 @@
       property="og:description"
       content="Disfrutá del sabor natural de la mejor carne argentina. Calidad premium directa del campo a tu mesa."
     />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://puesto-de-campo-web.vercel.app" />
     <meta
       property="og:image"
-      content="https://puesto-de-campo-web.vercel.app/images/puesto-logo-seo.jpeEg"
+      content="https://puesto-de-campo-web.vercel.app/images/puesto-logo-seo.jpeg"
     />
+    <meta
+      property="og:image:secure_url"
+      content="https://puesto-de-campo-web.vercel.app/images/puesto-logo-seo.jpeg"
+    />
+    <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
 
@@ -34,11 +39,11 @@
     <meta name="twitter:title" content="Puesto de Campo - Carnes Premium" />
     <meta
       name="twitter:description"
-      content="Cortes vacunos seleccionados y embutidos artesanales."
+      content="Cortes vacunos seleccionados y embutidos artesanales del campo a tu mesa."
     />
     <meta
       name="twitter:image"
-      content="https://puesto-de-campo-web.vercel.app/images/puesto-logo-seo.jpg"
+      content="https://puesto-de-campo-web.vercel.app/images/puesto-logo-seo.jpeg"
     />
 
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
@@ -58,6 +63,19 @@
           "addressLocality": "Tu Ciudad",
           "addressRegion": "Buenos Aires",
           "addressCountry": "AR"
+        },
+        "openingHoursSpecification": {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday"
+          ],
+          "opens": "09:00",
+          "closes": "20:00"
         }
       }
     </script>
@@ -77,16 +95,20 @@
   </head>
 
   <body>
-    <noscript
-      ><iframe
+    <noscript>
+      <iframe
         src="https://www.googletagmanager.com/ns.html?id=GTM-TPDWHGRL"
         height="0"
         width="0"
         style="display: none; visibility: hidden"
-      ></iframe
-    ></noscript>
-
-    <div id="root"></div>
+      ></iframe>
+    </noscript>
+    <div id="root">
+      <header style="display: none">
+        <h1>Puesto de Campo - Carnicería de Selección</h1>
+        <p>Expertos en cortes vacunos argentinos y embutidos artesanales.</p>
+      </header>
+    </div>
 
     <script type="module" src="/src/main.tsx"></script>
   </body>
