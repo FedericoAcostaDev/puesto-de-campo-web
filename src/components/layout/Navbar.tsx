@@ -1,13 +1,13 @@
-import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, ShoppingCart } from 'lucide-react';
-import { useCart } from '@/contexts/CartContext';
-import logo from '@/assets/logo.jpg';
+import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { Menu, X, ShoppingCart } from "lucide-react";
+import { useCart } from "@/contexts/CartContext";
+import logo from "@/assets/logo.jpeg";
 
 const navLinks = [
-  { name: 'Inicio', path: '/' },
-  { name: 'Tienda', path: '/tienda' },
-  { name: 'Contacto', path: '/contacto' },
+  { name: "Inicio", path: "/" },
+  { name: "Tienda", path: "/tienda" },
+  { name: "Contacto", path: "/contacto" },
 ];
 
 export function Navbar() {
@@ -32,7 +32,7 @@ export function Navbar() {
               <Link
                 key={link.path}
                 to={link.path}
-                className={`nav-link ${isActive(link.path) ? 'active' : ''}`}
+                className={`nav-link ${isActive(link.path) ? "active" : ""}`}
               >
                 {link.name}
               </Link>
@@ -75,7 +75,7 @@ export function Navbar() {
                   key={link.path}
                   to={link.path}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className={`nav-link py-2 ${isActive(link.path) ? 'active' : ''}`}
+                  className={`nav-link py-2 ${isActive(link.path) ? "active" : ""}`}
                 >
                   {link.name}
                 </Link>
