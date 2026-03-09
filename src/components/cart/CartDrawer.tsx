@@ -270,7 +270,7 @@ export function CartDrawer() {
                     onChange={(e) => setShippingMethod(e.target.value)}
                   >
                     <option value="delivery">📍 Domicilio</option>
-                    <option value="pickup">🏠 Retiro</option>
+                    <option value="pickup">🛒 Retiro en Local</option>
                   </select>
                 </div>
                 <div className="space-y-2">
@@ -349,12 +349,9 @@ export function CartDrawer() {
                       }
                     >
                       <option value="">Seleccionar sucursal...</option>
-                      <option value="Sucursal Centro">
-                        Centro (Av. Colón 123)
-                      </option>
-                      <option value="Sucursal Norte">
-                        Norte (Calle Ficticia 456)
-                      </option>
+                      <option value="Sucursal Goyena">Pedro Goyena 298</option>
+                      <option value="Sucursal Suipacha">Suipacha 304</option>
+                      <option value="Sucursal Guzman">Gdor. Guzmán 1560</option>
                     </select>
                   </>
                 )}
