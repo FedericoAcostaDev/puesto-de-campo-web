@@ -78,23 +78,27 @@ export default function Index() {
       />
 
       {/* Hero Section */}
-      <section className="relative min-h-[75vh] md:min-h-[80vh] flex items-center justify-center texture-overlay overflow-hidden">
+      <section className="relative min-h-[80vh] flex items-center justify-center texture-overlay overflow-hidden">
         <div className="absolute inset-0">
           <img
             src={heroImage}
             alt="Carne Argentina Premium"
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/80 to-background" />
+          {/* Enhanced gradient for better text legibility and transition */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-background/70 to-background" />
         </div>
 
-        <div className="container mx-auto px-4 relative z-10 pt-12 pb-28 md:py-20">
+        {/* FIX: Increased bottom padding (pb-44 / md:pb-52) 
+            This creates space for the negative margin of the section below.
+        */}
+        <div className="container mx-auto px-4 relative z-10 pt-16 pb-44 md:pt-20 md:pb-52">
           <div className="max-w-2xl mx-auto md:mx-0 flex flex-col items-center md:items-start text-center md:text-left animate-slide-up">
-            <div className="mb-10 md:mb-8">
+            <div className="mb-8 md:mb-10">
               <img
                 src={logo}
                 alt="Puesto de Campo"
-                className="h-32 sm:h-40 md:h-32 w-auto rounded-2xl shadow-xl border-2 border-primary/20 object-contain bg-white/10 backdrop-blur-sm p-1"
+                className="h-28 sm:h-36 md:h-32 w-auto rounded-2xl shadow-xl border-2 border-primary/20 object-contain bg-white/10 backdrop-blur-sm p-1"
               />
             </div>
 
@@ -128,7 +132,8 @@ export default function Index() {
 
       {/* SECCIÓN DE OFERTAS */}
       {(loading || ofertas.length > 0) && (
-        <section className="relative z-20 -mt-20 md:-mt-24 pb-16">
+        /* FIX: Adjusted negative margin to be less aggressive on mobile */
+        <section className="relative z-20 -mt-20 md:-mt-28 pb-16">
           <div className="container mx-auto px-4">
             <div className="bg-background border border-border rounded-3xl md:rounded-[3rem] p-6 md:p-12 shadow-2xl">
               <div className="flex justify-between items-end mb-10">
@@ -149,10 +154,6 @@ export default function Index() {
                 </Link>
               </div>
 
-              {/* UPDATED GRID LOGIC: 
-                  1 col on mobile (will fill width if alone)
-                  2 cols on small tablets (sm:)
-                  4 cols on large screens (lg:) */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
                 {loading
                   ? Array.from({ length: 4 }).map((_, i) => (
