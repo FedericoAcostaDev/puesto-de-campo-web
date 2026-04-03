@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es-AR">
   <head>
     <meta charset="UTF-8" />
@@ -13,12 +13,13 @@
     <meta name="author" content="Puesto de Campo" />
     <meta name="robots" content="index, follow" />
 
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="apple-touch-icon" href="/favicon.ico" />
+
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://puesto-de-campo-web.vercel.app/" />
-    <meta
-      property="og:title"
-      content="Puesto de Campo - Carnicería de Selección"
-    />
+    <meta property="og:url" content="https://www.puestodecampo.com.ar/" />
+    <meta property="og:title" content="Puesto de Campo - Carnicería de Selección" />
     <meta
       property="og:description"
       content="Disfrutá del sabor natural de la mejor carne argentina. Calidad premium directa del campo a tu mesa."
@@ -27,11 +28,6 @@
       property="og:image"
       content="https://puesto-de-campo-web.vercel.app/images/puesto-logo-seo.jpeg"
     />
-    <meta
-      property="og:image:secure_url"
-      content="https://puesto-de-campo-web.vercel.app/images/puesto-logo-seo.jpeg"
-    />
-    <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
 
@@ -46,38 +42,44 @@
       content="https://puesto-de-campo-web.vercel.app/images/puesto-logo-seo.jpeg"
     />
 
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-
     <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "ButcherShop",
-        "name": "Puesto de Campo",
-        "image": "https://puesto-de-campo-web.vercel.app/images/puesto-logo-seo.jpeg",
-        "url": "https://puesto-de-campo-web.vercel.app",
-        "telephone": "+5411XXXXXXXX",
-        "priceRange": "$$",
-        "address": {
-          "@type": "PostalAddress",
-          "streetAddress": "Tu Dirección 123",
-          "addressLocality": "Tu Ciudad",
-          "addressRegion": "Buenos Aires",
-          "addressCountry": "AR"
+      [
+        {
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "name": "Puesto de Campo",
+          "url": "https://www.puestodecampo.com.ar"
         },
-        "openingHoursSpecification": {
-          "@type": "OpeningHoursSpecification",
-          "dayOfWeek": [
-            "Monday",
-            "Tuesday",
-            "Wednesday",
-            "Thursday",
-            "Friday",
-            "Saturday"
-          ],
-          "opens": "09:00",
-          "closes": "20:00"
+        {
+          "@context": "https://schema.org",
+          "@type": "ButcherShop",
+          "name": "Puesto de Campo",
+          "image": "https://puesto-de-campo-web.vercel.app/images/puesto-logo-seo.jpeg",
+          "url": "https://www.puestodecampo.com.ar",
+          "telephone": "+5411XXXXXXXX",
+          "priceRange": "$$",
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "Tu Dirección 123",
+            "addressLocality": "Tu Ciudad",
+            "addressRegion": "Buenos Aires",
+            "addressCountry": "AR"
+          },
+          "openingHoursSpecification": {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": [
+              "Monday",
+              "Tuesday",
+              "Wednesday",
+              "Thursday",
+              "Friday",
+              "Saturday"
+            ],
+            "opens": "09:00",
+            "closes": "20:00"
+          }
         }
-      }
+      ]
     </script>
 
     <script>
@@ -103,10 +105,18 @@
         style="display: none; visibility: hidden"
       ></iframe>
     </noscript>
+
     <div id="root">
-      <header style="display: none">
+      <header>
         <h1>Puesto de Campo - Carnicería de Selección</h1>
-        <p>Expertos en cortes vacunos argentinos y embutidos artesanales.</p>
+        <nav>
+            <ul>
+                <li><a href="/">Inicio</a></li>
+                <li><a href="/tienda">Tienda</a></li>
+                <li><a href="/contacto">Contacto</a></li>
+            </ul>
+        </nav>
+        <p>Expertos en cortes vacunos argentinos y embutidos artesanales de exportación.</p>
       </header>
     </div>
 
