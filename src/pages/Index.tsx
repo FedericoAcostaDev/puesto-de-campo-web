@@ -134,7 +134,7 @@ export default function Index() {
       {/* SECCIÓN DE OFERTAS */}
       {(loading || ofertas.length > 0) && (
         /* FIX: Adjusted negative margin to be less aggressive on mobile */
-        <section className="relative z-20 -mt-20 md:-mt-28 pb-16">
+        <section className="relative z-20 -mt-20 md:-mt-28 pb-16 bg-background">
           <div className="container mx-auto px-4">
             <div className="bg-background border border-border rounded-3xl md:rounded-[3rem] p-6 md:p-12 shadow-2xl">
               <div className="flex justify-between items-end mb-10">
@@ -274,22 +274,6 @@ export default function Index() {
               </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20 md:py-32 gradient-teal relative overflow-hidden">
-        <div className="container mx-auto px-4 text-center relative z-10">
-          <h2 className="font-display text-3xl md:text-5xl font-bold text-primary-foreground mb-6">
-            ¿Listo para probar?
-          </h2>
-          <Link
-            to="/tienda"
-            className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-background text-foreground font-semibold uppercase tracking-wider rounded-lg hover:bg-foreground hover:text-background transition-colors duration-300"
-          >
-            Ver Tienda
-            <ArrowRight className="h-4 w-4" />
-          </Link>
         </div>
       </section>
 

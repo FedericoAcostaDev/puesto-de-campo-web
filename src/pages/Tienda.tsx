@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { ProductCard } from "@/components/store/ProductCard";
 import { useProducts } from "@/hooks/useProducts";
@@ -20,6 +21,7 @@ const ProductSkeleton = () => (
 
 export default function Tienda() {
   const { products, loading, isRefreshing } = useProducts();
+  const [searchParams] = useSearchParams();
 
   const [selectedCategory, setSelectedCategory] = useState("Todos");
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -28,6 +30,14 @@ export default function Tienda() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  // --- NEW: Leer categoría de los parámetros de query ---
+  useEffect(() => {
+    const categoryParam = searchParams.get("category");
+    if (categoryParam) {
+      setSelectedCategory(decodeURIComponent(categoryParam));
+    }
+  }, [searchParams]);
 
   // Lógica de Scroll para el botón flotante
   useEffect(() => {
