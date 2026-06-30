@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Beef, Award, Truck, Users, ArrowUp } from "lucide-react";
+import { ArrowRight, Beef, Award, Truck, Users, ArrowUp, Plus } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { ProductCard } from "@/components/store/ProductCard";
+import { CategoryCard } from "@/components/store/CategoryCard";
 import { useProducts } from "@/hooks/useProducts";
 import heroImage from "@/assets/hero-meat.jpg";
-import logo from "@/assets/logo.jpg";
+import logo from "@/assets/logo.jpeg";
 
 const features = [
   {
@@ -133,7 +134,7 @@ export default function Index() {
       {/* SECCIÓN DE OFERTAS */}
       {(loading || ofertas.length > 0) && (
         /* FIX: Adjusted negative margin to be less aggressive on mobile */
-        <section className="relative z-20 -mt-20 md:-mt-28 pb-16">
+        <section className="relative z-20 -mt-20 md:-mt-28 pb-16 bg-background">
           <div className="container mx-auto px-4">
             <div className="bg-background border border-border rounded-3xl md:rounded-[3rem] p-6 md:p-12 shadow-2xl">
               <div className="flex justify-between items-end mb-10">
@@ -179,6 +180,77 @@ export default function Index() {
         </section>
       )}
 
+      {/* SECCIÓN DE CATEGORÍAS */}
+      {!loading && (
+        <section className="py-16 md:py-24 bg-background">
+          <div className="container mx-auto px-4">
+            <div className="space-y-10">
+              <div className="space-y-2">
+                <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground">
+                  Explora nuestras <span className="text-primary">Categorías</span>
+                </h2>
+                <p className="text-muted-foreground text-sm md:text-base">
+                  Descubrí todos nuestros productos organizados por tipo de corte.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+                {(() => {
+                  const categoryOrder = ["Vacuno", "Cerdo", "Pollo"];
+                  const uniqueCategories = Array.from(
+                    new Set(
+                      products
+                        .map((p) => p.category)
+                        .filter(
+                          (cat): cat is string =>
+                            Boolean(cat) &&
+                            cat.trim() !== "" &&
+                            cat.toLowerCase() !== "ofertas",
+                        ),
+                    ),
+                  );
+
+                  // Mostrar solo las categorías en categoryOrder que existan en los productos
+                  const orderedCategories = categoryOrder.filter((cat) =>
+                    uniqueCategories.some(
+                      (ucat) => ucat.toLowerCase() === cat.toLowerCase(),
+                    ),
+                  );
+
+                  return orderedCategories.map((categoryName) => (
+                    <CategoryCard
+                      key={categoryName}
+                      category={{
+                        name: categoryName,
+                        description: `Conocé nuestros ${categoryName.toLowerCase()}`,
+                      }}
+                    />
+                  ));
+                })()}
+
+                {/* Card para ir a todas las categorías */}
+                <Link
+                  to="/tienda"
+                  className="group rounded-lg overflow-hidden cursor-pointer"
+                >
+                  <div className="w-full aspect-square bg-card border border-border flex items-center justify-center hover:border-primary/50 transition-colors">
+                    <div className="text-center">
+                      <Plus className="h-16 w-16 text-primary mx-auto mb-4 group-hover:scale-110 transition-transform" />
+                      <p className="font-display text-lg font-semibold text-foreground">
+                        Todas las
+                      </p>
+                      <p className="font-display text-lg font-semibold text-primary">
+                        Categorías
+                      </p>
+                    </div>
+                  </div>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Features Section */}
       <section className="py-20 md:py-32 bg-background">
         <div className="container mx-auto px-4">
@@ -202,22 +274,6 @@ export default function Index() {
               </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20 md:py-32 gradient-teal relative overflow-hidden">
-        <div className="container mx-auto px-4 text-center relative z-10">
-          <h2 className="font-display text-3xl md:text-5xl font-bold text-primary-foreground mb-6">
-            ¿Listo para probar?
-          </h2>
-          <Link
-            to="/tienda"
-            className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-background text-foreground font-semibold uppercase tracking-wider rounded-lg hover:bg-foreground hover:text-background transition-colors duration-300"
-          >
-            Ver Tienda
-            <ArrowRight className="h-4 w-4" />
-          </Link>
         </div>
       </section>
 

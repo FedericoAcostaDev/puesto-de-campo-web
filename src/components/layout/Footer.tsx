@@ -8,7 +8,7 @@ import {
   ChevronUp,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import logo from "@/assets/logo.jpg";
+import logo from "@/assets/logo.jpeg";
 
 export function Footer() {
   const [navOpen, setNavOpen] = useState(false);
@@ -25,7 +25,7 @@ export function Footer() {
               alt="Puesto de Campo"
               className="h-20 w-auto mb-4"
             />
-            <p className="text-muted-foreground text-center md:text-left">
+            <p className="text-muted-foreground text-center md:text-left font-medium">
               El Sabor Natural de la Carne
             </p>
           </div>
@@ -45,7 +45,9 @@ export function Footer() {
             </button>
 
             <div
-              className={`${navOpen ? "flex" : "hidden"} md:flex flex-col gap-2 mt-4 md:mt-0 text-center md:text-left`}
+              className={`${
+                navOpen ? "flex" : "hidden"
+              } md:flex flex-col gap-2 mt-4 md:mt-0 text-center md:text-left`}
             >
               <Link
                 to="/"
@@ -87,7 +89,9 @@ export function Footer() {
             </button>
 
             <div
-              className={`${contactOpen ? "flex" : "hidden"} md:flex flex-col gap-3 mt-4 md:mt-0 text-muted-foreground`}
+              className={`${
+                contactOpen ? "flex" : "hidden"
+              } md:flex flex-col gap-3 mt-4 md:mt-0 text-muted-foreground`}
             >
               <a
                 href="https://www.instagram.com/puestodecampo/"
@@ -107,12 +111,10 @@ export function Footer() {
                 puestodecampoweb@gmail.com
               </div>
 
-              {/* Locales ahora es un Link que lleva a la sección específica */}
               <Link
                 to="/contacto#sedes"
                 className="flex items-center justify-center md:justify-start gap-2 hover:text-primary transition-colors group"
                 onClick={() => {
-                  // Pequeño truco para asegurar el scroll si ya estás en la página de contacto
                   const element = document.getElementById("sedes");
                   if (element) element.scrollIntoView({ behavior: "smooth" });
                 }}
@@ -124,19 +126,19 @@ export function Footer() {
           </div>
         </div>
 
+        {/* Copyright & Credit */}
         <div className="mt-12 pt-8 border-t border-border text-center text-muted-foreground text-sm">
           <p>
             © {new Date().getFullYear()} Puesto de Campo. Todos los derechos
             reservados.
           </p>
-          <p>
-            {" "}
+          <p className="mt-2">
             Diseñado y desarrollado por{" "}
             <a
-              href="https://github.com/FedericoAcostaDev"
+              href="https://portfolio-federicoacosta.vercel.app/"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-primary"
+              className="font-medium text-foreground hover:text-primary underline underline-offset-4 decoration-muted-foreground/30 hover:decoration-primary transition-all duration-300"
             >
               Federico Acosta
             </a>
