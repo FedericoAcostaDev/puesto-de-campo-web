@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Beef, Award, Truck, Users, ArrowUp } from "lucide-react";
+import { ArrowRight, Beef, Award, Truck, Users, ArrowUp, Plus } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { ProductCard } from "@/components/store/ProductCard";
+import { CategoryCard } from "@/components/store/CategoryCard";
 import { useProducts } from "@/hooks/useProducts";
 import heroImage from "@/assets/hero-meat.jpg";
 import logo from "@/assets/logo.jpeg";
@@ -172,6 +173,77 @@ export default function Index() {
                 >
                   Ver Todo el Catálogo
                   <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* SECCIÓN DE CATEGORÍAS */}
+      {!loading && (
+        <section className="py-16 md:py-24 bg-background">
+          <div className="container mx-auto px-4">
+            <div className="space-y-10">
+              <div className="space-y-2">
+                <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground">
+                  Explora nuestras <span className="text-primary">Categorías</span>
+                </h2>
+                <p className="text-muted-foreground text-sm md:text-base">
+                  Descubrí todos nuestros productos organizados por tipo de corte.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+                {(() => {
+                  const categoryOrder = ["Vacuno", "Cerdo", "Pollo"];
+                  const uniqueCategories = Array.from(
+                    new Set(
+                      products
+                        .map((p) => p.category)
+                        .filter(
+                          (cat): cat is string =>
+                            Boolean(cat) &&
+                            cat.trim() !== "" &&
+                            cat.toLowerCase() !== "ofertas",
+                        ),
+                    ),
+                  );
+
+                  // Mostrar solo las categorías en categoryOrder que existan en los productos
+                  const orderedCategories = categoryOrder.filter((cat) =>
+                    uniqueCategories.some(
+                      (ucat) => ucat.toLowerCase() === cat.toLowerCase(),
+                    ),
+                  );
+
+                  return orderedCategories.map((categoryName) => (
+                    <CategoryCard
+                      key={categoryName}
+                      category={{
+                        name: categoryName,
+                        description: `Conocé nuestros ${categoryName.toLowerCase()}`,
+                      }}
+                    />
+                  ));
+                })()}
+
+                {/* Card para ir a todas las categorías */}
+                <Link
+                  to="/tienda"
+                  className="group rounded-lg overflow-hidden cursor-pointer"
+                >
+                  <div className="w-full aspect-square bg-card border border-border flex items-center justify-center hover:border-primary/50 transition-colors">
+                    <div className="text-center">
+                      <Plus className="h-16 w-16 text-primary mx-auto mb-4 group-hover:scale-110 transition-transform" />
+                      <p className="font-display text-lg font-semibold text-foreground">
+                        Todas las
+                      </p>
+                      <p className="font-display text-lg font-semibold text-primary">
+                        Categorías
+                      </p>
+                    </div>
+                  </div>
                 </Link>
               </div>
             </div>
