@@ -48,11 +48,32 @@ export default function Tienda() {
 
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
-  const dynamicCategories = useMemo(() => {
-    if (!products.length) return ["Todos"];
-    const rawCategories = products.map((p) => p.category);
-    const uniqueCategories = Array.from(new Set(rawCategories)).filter(Boolean);
-    return ["Todos", ...uniqueCategories.sort()];
+  const categoriesConfig = useMemo(() => {
+    if (!products.length) return { featured: [], main: [], other: [] };
+
+    const rawCategories = products
+      .map((p) => p.category)
+      .filter(Boolean);
+    const uniqueCategories = Array.from(new Set(rawCategories));
+
+    const mainOrder = ["Vacuno", "Achura", "Cerdo", "Pollo", "Milanesas", "Embutidos"];
+    const offertasIndex = uniqueCategories.findIndex(
+      (cat) => cat.toLowerCase() === "ofertas"
+    );
+
+    const featured = offertasIndex !== -1 ? [uniqueCategories[offertasIndex]] : [];
+    
+    const main = mainOrder.filter((cat) =>
+      uniqueCategories.some((ucat) => ucat.toLowerCase() === cat.toLowerCase())
+    );
+
+    const other = uniqueCategories.filter(
+      (cat) =>
+        cat.toLowerCase() !== "ofertas" &&
+        !main.some((m) => m.toLowerCase() === cat.toLowerCase())
+    );
+
+    return { featured, main, other };
   }, [products]);
 
   const filteredProducts = useMemo(() => {
@@ -80,22 +101,71 @@ export default function Tienda() {
       {/* Main Content */}
       <section className="py-12 bg-background relative">
         <div className="container mx-auto px-4">
-          {/* Categorías Dinámicas */}
-          <div className="flex flex-wrap justify-center gap-2 md:gap-4 mb-12">
-            {dynamicCategories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`px-4 py-2 md:px-6 md:py-2 rounded-full text-xs md:text-sm font-medium transition-all duration-300 ${
-                  selectedCategory === cat
-                    ? "bg-primary text-primary-foreground shadow-lg"
-                    : "bg-card text-muted-foreground border border-border hover:border-primary"
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
+          {/* Ofertas - Destacada */}
+          {categoriesConfig.featured.length > 0 && (
+            <div className="mb-8">
+              <div className="flex flex-wrap justify-center gap-2">
+                {categoriesConfig.featured.map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => setSelectedCategory(cat)}
+                    className={`px-6 py-3 rounded-full text-sm font-semibold transition-all duration-300 ${
+                      selectedCategory === cat
+                        ? "bg-primary text-primary-foreground shadow-lg scale-105"
+                        : "bg-card text-foreground border-2 border-primary hover:bg-primary/10"
+                    }`}
+                  >
+                    ⭐ {cat.toLowerCase() === "ofertas" ? "Promociones" : cat}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Categorías Principales */}
+          {categoriesConfig.main.length > 0 && (
+            <div className="mb-8">
+              <div className="flex flex-wrap justify-center gap-2 md:gap-4">
+                {categoriesConfig.main.map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => setSelectedCategory(cat)}
+                    className={`px-4 py-2 md:px-6 md:py-2 rounded-full text-xs md:text-sm font-medium transition-all duration-300 ${
+                      selectedCategory === cat
+                        ? "bg-primary text-primary-foreground shadow-lg"
+                        : "bg-card text-muted-foreground border border-border hover:border-primary"
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Categorías Adicionales */}
+          {categoriesConfig.other.length > 0 && (
+            <div className="mb-12 pb-6 border-t border-border pt-6">
+              <p className="text-xs text-muted-foreground mb-3 text-center uppercase tracking-wider">
+                Otras categorías
+              </p>
+              <div className="flex flex-wrap justify-center gap-2">
+                {categoriesConfig.other.map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => setSelectedCategory(cat)}
+                    className={`px-3 py-1 rounded-full text-xs font-medium transition-all duration-300 ${
+                      selectedCategory === cat
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted text-muted-foreground hover:bg-card border border-border/50"
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Grid de Productos */}
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6">
