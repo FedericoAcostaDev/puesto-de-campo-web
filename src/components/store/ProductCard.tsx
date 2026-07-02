@@ -2,6 +2,7 @@ import { Plus } from "lucide-react";
 import { Product, useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
+import { triggerCartFeedback } from "@/lib/cartFeedback";
 
 interface ProductCardProps {
   product: Product;
@@ -22,74 +23,25 @@ export function ProductCard({ product }: ProductCardProps) {
     }).format(price);
   };
 
-  /**
-   * Generates a "Fire Spark" particle effect at the click coordinates.
-   * Only triggered on desktop via handleAddToCart.
-   */
-  const triggerFireEffect = (e: React.MouseEvent) => {
-    const particleCount = 10;
-    const colors = ["#ff4500", "#ff8c00", "#ffd700", "#ffffff"];
+  const triggerVisualFeedback = (e: React.MouseEvent | React.TouchEvent) => {
+    const clientX =
+      "touches" in e ? e.touches[0]?.clientX ?? window.innerWidth / 2 : e.clientX;
+    const clientY =
+      "touches" in e ? e.touches[0]?.clientY ?? window.innerHeight / 2 : e.clientY;
 
-    for (let i = 0; i < particleCount; i++) {
-      const particle = document.createElement("span");
-
-      // Basic styling
-      const size = Math.random() * 6 + 4 + "px";
-      const color = colors[Math.floor(Math.random() * colors.length)];
-
-      particle.style.width = size;
-      particle.style.height = size;
-      particle.style.backgroundColor = color;
-      particle.style.position = "fixed";
-      particle.style.borderRadius = "50%";
-      particle.style.pointerEvents = "none";
-      particle.style.zIndex = "9999";
-      particle.style.boxShadow = `0 0 10px ${color}`;
-
-      // Start position at mouse cursor
-      particle.style.left = `${e.clientX}px`;
-      particle.style.top = `${e.clientY}px`;
-
-      // Random trajectory
-      const angle = Math.random() * Math.PI * 2;
-      const velocity = Math.random() * 80 + 40;
-      const destX = Math.cos(angle) * velocity;
-      const destY = Math.sin(angle) * velocity;
-
-      // Web Animations API for smooth performance
-      particle.animate(
-        [
-          { transform: "translate(-50%, -50%) scale(1)", opacity: 1 },
-          {
-            transform: `translate(calc(-50% + ${destX}px), calc(-50% + ${destY}px)) scale(0)`,
-            opacity: 0,
-          },
-        ],
-        {
-          duration: 700,
-          easing: "cubic-bezier(0.1, 0.8, 0.3, 1)",
-          fill: "forwards",
-        },
-      );
-
-      document.body.appendChild(particle);
-
-      // Clean up DOM
-      setTimeout(() => {
-        particle.remove();
-      }, 700);
-    }
+    triggerCartFeedback(clientX, clientY);
   };
 
-  const handleAddToCart = (e: React.MouseEvent) => {
+  const handleAddToCart = (e: React.MouseEvent | React.TouchEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
-    // Trigger visual fire confirmation
-    triggerFireEffect(e);
+    triggerVisualFeedback(e);
 
     addToCart(product);
-    toast.success(`${formatText(product.name)} agregado al carrito`);
+    toast.success(`${formatText(product.name)} agregado al carrito`, {
+      description: "Se agregó al carrito correctamente",
+    });
   };
 
   const jsonLd = {
@@ -138,6 +90,7 @@ export function ProductCard({ product }: ProductCardProps) {
         {/* Desktop-only Add Button with Fire Effect */}
         <button
           onClick={handleAddToCart}
+          onTouchStart={handleAddToCart}
           className="hidden md:flex absolute bottom-4 right-4 p-3 bg-primary text-primary-foreground rounded-full opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 hover:scale-110 active:scale-90 z-10 items-center justify-center"
           title="Agregar al carrito"
         >
