@@ -8,6 +8,8 @@ import {
   MessageCircle,
   CheckCircle2,
   AlertCircle,
+  Timer,
+  TriangleAlert,
 } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import {
@@ -286,7 +288,6 @@ export function CartDrawer() {
                   >
                     <option value="Efectivo">Efectivo</option>
                     <option value="Transferencia">Transferencia</option>
-                    <option value="Mercado Pago">Mercado Pago</option>
                   </select>
                 </div>
               </div>
@@ -362,6 +363,23 @@ export function CartDrawer() {
                   </p>
                 )}
               </div>
+
+              {shippingMethod === "delivery" && (
+                <div className="space-y-3">
+                  <div className="flex items-start gap-2 rounded-2xl border border-primary/10 bg-primary/5 p-4 shadow-sm">
+                    <TriangleAlert className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                    <p className="text-sm font-medium text-foreground">
+                      El costo de envío no está incluido, se debe abonar aparte.
+                    </p>
+                  </div>
+                  <div className="flex items-start gap-2 rounded-2xl border border-primary/10 bg-background/80 p-4 shadow-sm">
+                    <Timer className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                    <p className="text-sm font-medium text-foreground">
+                      El envío demora 30 minutos aproximadamente.
+                    </p>
+                  </div>
+                </div>
+              )}
 
               <div className="space-y-4">
                 <div>
