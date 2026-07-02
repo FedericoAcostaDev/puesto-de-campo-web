@@ -78,7 +78,7 @@ export default function Index() {
           100% { opacity: 1; }
         }
         .animate-pulse-opacity {
-          animation: pulse-opacity 4s ease-in-out infinite;
+          animation: pulse-opacity 8s ease-in-out infinite;
         }
       `,
         }}
@@ -93,7 +93,7 @@ export default function Index() {
             className="w-full h-full object-cover animate-pulse-opacity"
           />
           {/* Enhanced gradient for better text legibility and transition */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-background/70 to-background" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-red-700/7 to-background" />
         </div>
 
         {/* FIX: Increased bottom padding (pb-44 / md:pb-52) 
