@@ -102,12 +102,10 @@ export default function Index() {
         <div className="container mx-auto px-4 relative z-10 pt-16 pb-44 md:pt-20 md:pb-52">
           <div className="max-w-2xl mx-auto md:mx-0 flex flex-col items-center md:items-start text-center md:text-left animate-slide-up">
             <h1 className="font-display text-4xl md:text-6xl font-bold text-foreground mb-6 leading-tight">
-              El Sabor Natural
-              <br />
-              <span className="text-primary">de la Carne</span>
+              PUESTO de CAMPO
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground mb-8 leading-relaxed max-w-md md:max-w-none">
-              Descubrí la calidad premium de Puesto de Campo.
+              El sabor Natural de la Carne
             </p>
             <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
               <Link
@@ -137,7 +135,7 @@ export default function Index() {
               <div className="flex justify-between items-end mb-10">
                 <div className="space-y-2">
                   <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground">
-                    Promociones
+                    <span className="text-primary">Promociones</span>
                   </h2>
                   <p className="text-muted-foreground text-sm md:text-base">
                     Aprovechá estas promociones por tiempo limitado.
