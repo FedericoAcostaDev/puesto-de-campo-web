@@ -5,8 +5,6 @@ import { Layout } from "@/components/layout/Layout";
 import { ProductCard } from "@/components/store/ProductCard";
 import { CategoryCard } from "@/components/store/CategoryCard";
 import { useProducts } from "@/hooks/useProducts";
-import heroImage from "@/assets/hero-meat.jpg";
-import logo from "@/assets/logo.jpeg";
 
 const features = [
   {
@@ -74,6 +72,14 @@ export default function Index() {
           __html: `
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        @keyframes pulse-opacity {
+          0% { opacity: 1; }
+          50% { opacity: 0.6; }
+          100% { opacity: 1; }
+        }
+        .animate-pulse-opacity {
+          animation: pulse-opacity 4s ease-in-out infinite;
+        }
       `,
         }}
       />
@@ -82,9 +88,9 @@ export default function Index() {
       <section className="relative min-h-[80vh] flex items-center justify-center texture-overlay overflow-hidden">
         <div className="absolute inset-0">
           <img
-            src={heroImage}
+            src="/images/fondobandera.jpeg"
             alt="Carne Argentina Premium"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover animate-pulse-opacity"
           />
           {/* Enhanced gradient for better text legibility and transition */}
           <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-background/70 to-background" />
@@ -95,22 +101,13 @@ export default function Index() {
         */}
         <div className="container mx-auto px-4 relative z-10 pt-16 pb-44 md:pt-20 md:pb-52">
           <div className="max-w-2xl mx-auto md:mx-0 flex flex-col items-center md:items-start text-center md:text-left animate-slide-up">
-            <div className="mb-8 md:mb-10">
-              <img
-                src={logo}
-                alt="Puesto de Campo"
-                className="h-28 sm:h-36 md:h-32 w-auto rounded-2xl shadow-xl border-2 border-primary/20 object-contain bg-white/10 backdrop-blur-sm p-1"
-              />
-            </div>
-
             <h1 className="font-display text-4xl md:text-6xl font-bold text-foreground mb-6 leading-tight">
               El Sabor Natural
               <br />
               <span className="text-primary">de la Carne</span>
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground mb-8 leading-relaxed max-w-md md:max-w-none">
-              Descubrí la calidad premium de nuestros cortes argentinos. Del
-              campo a tu mesa.
+              Descubrí la calidad premium de Puesto de Campo.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
               <Link
