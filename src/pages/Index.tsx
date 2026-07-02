@@ -105,7 +105,7 @@ export default function Index() {
               PUESTO de CAMPO
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground mb-8 leading-relaxed max-w-md md:max-w-none">
-              El sabor Natural de la Carne
+              El Sabor Natural de la Carne
             </p>
             <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
               <Link
