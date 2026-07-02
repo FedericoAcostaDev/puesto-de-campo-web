@@ -66,7 +66,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
   return (
     <Link
-      to={`/producto/${product.id}`}
+      to={`/producto/${product.slug ?? product.id}`}
       className="card-product group block no-underline"
     >
       <script

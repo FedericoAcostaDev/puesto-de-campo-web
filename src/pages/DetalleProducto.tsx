@@ -10,21 +10,21 @@ import { Layout } from "@/components/layout/Layout";
 import { triggerCartFeedback } from "@/lib/cartFeedback";
 
 const DetalleProducto = () => {
-  const { id } = useParams<{ id: string }>();
+  const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { addToCart } = useCart();
 
   // Scroll to top automatically when the page opens
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [id]);
+  }, [slug]);
 
   const { data: products, isLoading } = useQuery({
     queryKey: ["products"],
     queryFn: getProducts,
   });
 
-  const product = products?.find((p) => p.id === id);
+  const product = products?.find((p) => p.slug === slug || p.id === slug);
 
   /**
    * Helper to trigger subtle haptic feedback
