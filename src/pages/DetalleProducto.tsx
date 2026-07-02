@@ -72,6 +72,8 @@ const DetalleProducto = () => {
     }).format(price);
   };
 
+  const selectedTotalPrice = selectedPurchase?.price ?? product?.price;
+
   if (isLoading)
     return (
       <div className="flex h-screen w-full items-center justify-center">
@@ -210,7 +212,7 @@ const DetalleProducto = () => {
                 Total
               </p>
               <p className="text-xl font-bold text-foreground leading-none">
-                {isWholeChicken ? "A definir" : formatPrice(product.price)}
+                {isWholeChicken ? "A definir" : formatPrice(selectedTotalPrice)}
               </p>
             </div>
             <Button

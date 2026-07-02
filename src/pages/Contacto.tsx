@@ -38,7 +38,7 @@ export default function Contacto() {
     },
     {
       nombre: "Pte. Perón Este 1524",
-      tipo: "Planta",
+      tipo: "Planta Frigorífica",
       link: "http://maps.google.com/?q=Pte.+Peron+Este+1524+Rio+Cuarto",
       whatsapp: null, // Planta no suele recibir pedidos directos, pero se puede agregar
     },
