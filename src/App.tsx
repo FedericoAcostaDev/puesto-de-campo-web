@@ -64,7 +64,7 @@ const App = () => (
             <Route path="/contacto" element={<Contacto />} />
             
             {/* NUEVA RUTA DINÁMICA */}
-            <Route path="/producto/:id" element={<DetalleProducto />} />
+            <Route path="/producto/:slug" element={<DetalleProducto />} />
             
             <Route path="*" element={<NotFound />} />
           </Routes>

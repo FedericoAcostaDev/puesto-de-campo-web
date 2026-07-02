@@ -1,4 +1,5 @@
 import { Product } from "@/contexts/CartContext";
+import { createSlug } from '@/lib/utils';
 
 /**
  * Función para limpiar y obtener categorías únicas de los productos del Sheet.
@@ -48,6 +49,7 @@ export const getProducts = async (): Promise<Product[]> => {
     return productsArray.map((p: any) => ({
       ...p,
       id: p.id?.toString() || Math.random().toString(36).substr(2, 9),
+      slug: createSlug(String(p.name)) || p.id?.toString() || "",
       price: Number(p.price) || 0,
       image: p.image || "/placeholder-meat.jpg", // Imagen por defecto si falta
       category: p.category || "General",
