@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Plus, ArrowLeft, ShieldCheck, Truck, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Layout } from "@/components/layout/Layout";
+import { triggerCartFeedback } from "@/lib/cartFeedback";
 
 const DetalleProducto = () => {
   const { id } = useParams<{ id: string }>();
@@ -39,67 +40,23 @@ const DetalleProducto = () => {
     }
   };
 
-  /**
-   * Generates the fire spark effect at the click/tap location
-   */
-  const triggerFireEffect = (e: React.MouseEvent | React.TouchEvent) => {
-    const particleCount = 12;
-    const colors = ["#ff4500", "#ff8c00", "#ffd700", "#ffffff"];
-
+  const triggerVisualFeedback = (e: React.MouseEvent | React.TouchEvent) => {
     const clientX =
       "touches" in e ? e.touches[0].clientX : (e as React.MouseEvent).clientX;
     const clientY =
       "touches" in e ? e.touches[0].clientY : (e as React.MouseEvent).clientY;
 
-    for (let i = 0; i < particleCount; i++) {
-      const particle = document.createElement("span");
-      const size = Math.random() * 8 + 4 + "px";
-      const color = colors[Math.floor(Math.random() * colors.length)];
-
-      Object.assign(particle.style, {
-        width: size,
-        height: size,
-        backgroundColor: color,
-        position: "fixed",
-        borderRadius: "50%",
-        pointerEvents: "none",
-        zIndex: "9999",
-        boxShadow: `0 0 12px ${color}`,
-        left: `${clientX}px`,
-        top: `${clientY}px`,
-      });
-
-      const angle = Math.random() * Math.PI * 2;
-      const velocity = Math.random() * 90 + 40;
-      const destX = Math.cos(angle) * velocity;
-      const destY = Math.sin(angle) * velocity;
-
-      particle.animate(
-        [
-          { transform: "translate(-50%, -50%) scale(1)", opacity: 1 },
-          {
-            transform: `translate(calc(-50% + ${destX}px), calc(-50% + ${destY}px)) scale(0)`,
-            opacity: 0,
-          },
-        ],
-        {
-          duration: 800,
-          easing: "cubic-bezier(0.1, 0.8, 0.3, 1)",
-          fill: "forwards",
-        },
-      );
-
-      document.body.appendChild(particle);
-      setTimeout(() => particle.remove(), 800);
-    }
+    triggerCartFeedback(clientX, clientY);
   };
 
   const handleAddToCart = (e: React.MouseEvent | React.TouchEvent) => {
     if (product) {
       triggerVibration(15); // Subtle haptic tick
-      triggerFireEffect(e);
+      triggerVisualFeedback(e);
       addToCart(product);
-      toast.success(`${product.name} agregado`);
+      toast.success(`${product.name} agregado`, {
+        description: "Se agregó al carrito correctamente",
+      });
     }
   };
 
