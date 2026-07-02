@@ -30,7 +30,7 @@ const features = [
     icon: Users,
     title: "Tradición Familiar",
     description:
-      "Más de 5 años de experiencia compartiendo el verdadero sabor de la carne.",
+      "De generación en generación, compartiendo el verdadero sabor de la carne.",
   },
 ];
 
