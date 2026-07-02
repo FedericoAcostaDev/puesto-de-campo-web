@@ -61,6 +61,13 @@ export function CartDrawer() {
 
   const isFormValid = !errors.name && !errors.address && !errors.branch;
 
+  const isWholeChickenItem = (item: { category?: string; name?: string }) => {
+    const value = `${item.category ?? ""} ${item.name ?? ""}`.toLowerCase();
+    return /pollo\s+entero|entero\s+pollo|whole chicken|pollo/i.test(value) && /entero|whole/i.test(value);
+  };
+
+  const hasWholeChicken = items.some(isWholeChickenItem);
+
   useEffect(() => {
     const savedData = localStorage.getItem("puesto-de-campo-customer");
     if (savedData) {
@@ -104,7 +111,10 @@ export function CartDrawer() {
 
     message += `\n*PRODUCTOS:*\n`;
     items.forEach((item) => {
-      message += `• ${item.quantity}x ${item.name} - $${(item.price * item.quantity).toLocaleString("es-AR")}\n`;
+      const isWholeChicken = /pollo\s+entero|entero\s+pollo|whole chicken|pollo/i.test(`${item.category ?? ""} ${item.name ?? ""}`.toLowerCase()) && /entero|whole/i.test(`${item.category ?? ""} ${item.name ?? ""}`.toLowerCase());
+      const unitLabel = isWholeChicken ? "pollo entero" : item.name;
+      const priceText = isWholeChicken ? "precio a definir" : `$${(item.price * item.quantity).toLocaleString("es-AR")}`;
+      message += `• ${item.quantity}x ${unitLabel} - ${priceText}\n`;
     });
 
     message += `\n--------------------------------\n`;
@@ -190,7 +200,7 @@ export function CartDrawer() {
                         </p>
                       )}
                       <p className="text-primary font-bold text-sm mt-1">
-                        ${item.price.toLocaleString("es-AR")}
+                        {(/pollo\s+entero|entero\s+pollo|whole chicken|pollo/i.test(`${item.category ?? ""} ${item.name ?? ""}`.toLowerCase()) && /entero|whole/i.test(`${item.category ?? ""} ${item.name ?? ""}`.toLowerCase()) ? "A definir" : `$${item.price.toLocaleString("es-AR")}`)}
                       </p>
                     </div>
                     <div className="flex items-center justify-between">
@@ -416,13 +426,20 @@ export function CartDrawer() {
         </ScrollArea>
 
         <div className="p-6 bg-background border-t border-border mt-auto">
-          <div className="flex justify-between items-center mb-6">
-            <span className="text-muted-foreground font-medium">
-              Subtotal estimado:
-            </span>
-            <span className="text-2xl font-bold text-primary font-display">
-              ${totalPrice.toLocaleString("es-AR")}
-            </span>
+          <div className="flex flex-col gap-1 mb-6">
+            <div className="flex justify-between items-center">
+              <span className="text-muted-foreground font-medium">
+                Subtotal estimado:
+              </span>
+              <span className="text-2xl font-bold text-primary font-display">
+                ${totalPrice.toLocaleString("es-AR")}
+              </span>
+            </div>
+            {hasWholeChicken && (
+              <span className="text-sm text-muted-foreground">
+                pollo entero a definir
+              </span>
+            )}
           </div>
 
           {step === "cart" ? (

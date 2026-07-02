@@ -115,7 +115,7 @@ export function PurchaseSelector({ product, onSelectionChange }: PurchaseSelecto
             {isWeight ? "Precio estimado" : "Precio"}
           </p>
           <p className="text-sm font-semibold text-foreground">
-            {isWholeChicken ? "Total + pollo entero a definir" : new Intl.NumberFormat("es-AR", {
+            {new Intl.NumberFormat("es-AR", {
               style: "currency",
               currency: "ARS",
             }).format(selection.price)}

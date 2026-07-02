@@ -120,7 +120,7 @@ export function ProductCard({ product }: ProductCardProps) {
               {product.weight}
             </span>
             <span className="text-lg font-semibold text-foreground">
-              {isWholeChicken ? "Total + pollo entero a definir" : formatPrice(selectedPurchase?.price ?? product.price)}
+              {formatPrice(selectedPurchase?.price ?? product.price)}
             </span>
           </div>
         </div>

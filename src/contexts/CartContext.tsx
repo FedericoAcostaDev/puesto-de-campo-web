@@ -1,5 +1,10 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
+const isWholeChickenProduct = (product: Pick<Product, "category" | "name">): boolean => {
+  const haystack = `${product.category ?? ""} ${product.name ?? ""}`.toLowerCase();
+  return /pollo\s+entero|entero\s+pollo|whole chicken|pollo/i.test(haystack) && /entero|whole/i.test(haystack);
+};
+
 export interface Product {
   id: string;
   slug: string;
@@ -41,6 +46,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const addToCart = (product: Product, selection?: { price: number; label: string; amount: number; mode?: string }) => {
     const selectedPrice = selection?.price ?? product.price;
+    const shouldShowPendingPrice = isWholeChickenProduct(product);
     const selectedLabel = selection?.label ?? product.purchaseLabel ?? product.weight ?? "1 unidad";
     const selectedAmount = selection?.amount ?? product.purchaseAmount ?? 1;
     const selectedMode = selection?.mode ?? product.purchaseMode ?? "";
@@ -63,7 +69,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
           cartKey,
           productId: product.id,
           quantity: 1,
-          price: selectedPrice,
+          price: shouldShowPendingPrice ? 0 : selectedPrice,
           purchaseLabel: selectedLabel,
           purchaseAmount: selectedAmount,
           purchaseMode: selectedMode,

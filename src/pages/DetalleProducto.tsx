@@ -16,7 +16,6 @@ const DetalleProducto = () => {
   const navigate = useNavigate();
   const { addToCart } = useCart();
   const [selectedPurchase, setSelectedPurchase] = useState<PurchaseSelection | null>(null);
-  const isWholeChicken = product ? isWholeChickenProduct(product) : false;
 
   // Scroll to top automatically when the page opens
   useEffect(() => {
@@ -29,6 +28,7 @@ const DetalleProducto = () => {
   });
 
   const product = products?.find((p) => p.slug === slug || p.id === slug);
+  const isWholeChicken = product ? isWholeChickenProduct(product) : false;
 
   /**
    * Helper to trigger subtle haptic feedback
@@ -210,7 +210,7 @@ const DetalleProducto = () => {
                 Total
               </p>
               <p className="text-xl font-bold text-foreground leading-none">
-                {formatPrice(product.price)}
+                {isWholeChicken ? "A definir" : formatPrice(product.price)}
               </p>
             </div>
             <Button
