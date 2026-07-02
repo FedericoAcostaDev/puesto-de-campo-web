@@ -1,8 +1,11 @@
+import { useState } from "react";
 import { Plus } from "lucide-react";
 import { Product, useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 import { triggerCartFeedback } from "@/lib/cartFeedback";
+import { PurchaseSelector } from "@/components/store/PurchaseSelector";
+import { PurchaseSelection, getPurchaseSelection, isWholeChickenProduct } from "@/lib/purchase";
 
 interface ProductCardProps {
   product: Product;
@@ -10,6 +13,8 @@ interface ProductCardProps {
 
 export function ProductCard({ product }: ProductCardProps) {
   const { addToCart } = useCart();
+  const [selectedPurchase, setSelectedPurchase] = useState<PurchaseSelection | null>(null);
+  const isWholeChicken = isWholeChickenProduct(product);
 
   const formatText = (text: string) => {
     if (!text) return "";
@@ -38,7 +43,8 @@ export function ProductCard({ product }: ProductCardProps) {
 
     triggerVisualFeedback(e);
 
-    addToCart(product);
+    const selection = selectedPurchase ?? getPurchaseSelection(product, 1);
+    addToCart(product, selection);
     toast.success(`${formatText(product.name)} agregado al carrito`, {
       description: "Se agregó al carrito correctamente",
     });
@@ -66,7 +72,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
   return (
     <Link
-      to={`/producto/${product.id}`}
+      to={`/producto/${product.slug ?? product.id}`}
       className="card-product group block no-underline"
     >
       <script
@@ -108,13 +114,15 @@ export function ProductCard({ product }: ProductCardProps) {
         <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
           {formatText(product.description)}
         </p>
-        <div className="flex items-center justify-between mt-4">
-          <span className="text-muted-foreground text-sm">
-            {product.weight}
-          </span>
-          <span className="text-lg font-semibold text-foreground">
-            {formatPrice(product.price)}
-          </span>
+        <div className="mt-4 space-y-3" onClick={(e) => e.stopPropagation()}>
+          <div className="flex items-center justify-between">
+            <span className="text-muted-foreground text-sm">
+              {product.weight}
+            </span>
+            <span className="text-lg font-semibold text-foreground">
+              {formatPrice(selectedPurchase?.price ?? product.price)}
+            </span>
+          </div>
         </div>
       </div>
     </Link>

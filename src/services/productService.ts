@@ -1,5 +1,6 @@
 import Papa from 'papaparse';
 import { Product } from '../types';
+import { createSlug } from '../lib/utils';
 
 /**
  * Cargamos la URL desde las variables de entorno (.env).
@@ -65,6 +66,7 @@ export const fetchProductsFromSheet = async (): Promise<Product[]> => {
             .filter(p => p.name && p.id) // Asegura que el producto tenga datos mínimos
             .map(p => ({
               id: String(p.id),
+              slug: createSlug(String(p.name)) || String(p.id),
               name: String(p.name),
               description: p.description || '',
               price: Number(p.price) || 0,

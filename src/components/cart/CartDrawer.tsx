@@ -8,6 +8,8 @@ import {
   MessageCircle,
   CheckCircle2,
   AlertCircle,
+  Timer,
+  TriangleAlert,
 } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import {
@@ -59,6 +61,13 @@ export function CartDrawer() {
 
   const isFormValid = !errors.name && !errors.address && !errors.branch;
 
+  const isWholeChickenItem = (item: { category?: string; name?: string }) => {
+    const value = `${item.category ?? ""} ${item.name ?? ""}`.toLowerCase();
+    return /pollo\s+entero|entero\s+pollo|whole chicken|pollo/i.test(value) && /entero|whole/i.test(value);
+  };
+
+  const hasWholeChicken = items.some(isWholeChickenItem);
+
   useEffect(() => {
     const savedData = localStorage.getItem("puesto-de-campo-customer");
     if (savedData) {
@@ -102,7 +111,10 @@ export function CartDrawer() {
 
     message += `\n*PRODUCTOS:*\n`;
     items.forEach((item) => {
-      message += `• ${item.quantity}x ${item.name} - $${(item.price * item.quantity).toLocaleString("es-AR")}\n`;
+      const isWholeChicken = /pollo\s+entero|entero\s+pollo|whole chicken|pollo/i.test(`${item.category ?? ""} ${item.name ?? ""}`.toLowerCase()) && /entero|whole/i.test(`${item.category ?? ""} ${item.name ?? ""}`.toLowerCase());
+      const unitLabel = isWholeChicken ? "pollo entero" : item.name;
+      const priceText = isWholeChicken ? "precio a definir" : `$${(item.price * item.quantity).toLocaleString("es-AR")}`;
+      message += `• ${item.quantity}x ${unitLabel} - ${priceText}\n`;
     });
 
     message += `\n--------------------------------\n`;
@@ -182,8 +194,13 @@ export function CartDrawer() {
                       <h4 className="font-bold text-sm leading-tight">
                         {item.name}
                       </h4>
-                      <p className="text-primary font-bold text-sm">
-                        ${item.price.toLocaleString("es-AR")}
+                      {item.purchaseLabel && (
+                        <p className="text-[11px] text-muted-foreground mt-1">
+                          {item.purchaseLabel}
+                        </p>
+                      )}
+                      <p className="text-primary font-bold text-sm mt-1">
+                        {(/pollo\s+entero|entero\s+pollo|whole chicken|pollo/i.test(`${item.category ?? ""} ${item.name ?? ""}`.toLowerCase()) && /entero|whole/i.test(`${item.category ?? ""} ${item.name ?? ""}`.toLowerCase()) ? "A definir" : `$${item.price.toLocaleString("es-AR")}`)}
                       </p>
                     </div>
                     <div className="flex items-center justify-between">
@@ -286,7 +303,6 @@ export function CartDrawer() {
                   >
                     <option value="Efectivo">Efectivo</option>
                     <option value="Transferencia">Transferencia</option>
-                    <option value="Mercado Pago">Mercado Pago</option>
                   </select>
                 </div>
               </div>
@@ -363,6 +379,23 @@ export function CartDrawer() {
                 )}
               </div>
 
+              {shippingMethod === "delivery" && (
+                <div className="space-y-3">
+                  <div className="flex items-start gap-2 rounded-2xl border border-primary/10 bg-primary/5 p-4 shadow-sm">
+                    <TriangleAlert className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                    <p className="text-sm font-medium text-foreground">
+                      El costo de envío no está incluido, se debe abonar aparte.
+                    </p>
+                  </div>
+                  <div className="flex items-start gap-2 rounded-2xl border border-primary/10 bg-background/80 p-4 shadow-sm">
+                    <Timer className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                    <p className="text-sm font-medium text-foreground">
+                      El envío demora 30 minutos aproximadamente.
+                    </p>
+                  </div>
+                </div>
+              )}
+
               <div className="space-y-4">
                 <div>
                   <Label className="text-sm font-semibold mb-2 block">
@@ -393,13 +426,20 @@ export function CartDrawer() {
         </ScrollArea>
 
         <div className="p-6 bg-background border-t border-border mt-auto">
-          <div className="flex justify-between items-center mb-6">
-            <span className="text-muted-foreground font-medium">
-              Subtotal estimado:
-            </span>
-            <span className="text-2xl font-bold text-primary font-display">
-              ${totalPrice.toLocaleString("es-AR")}
-            </span>
+          <div className="flex flex-col gap-1 mb-6">
+            <div className="flex justify-between items-center">
+              <span className="text-muted-foreground font-medium">
+                Subtotal estimado:
+              </span>
+              <span className="text-2xl font-bold text-primary font-display">
+                ${totalPrice.toLocaleString("es-AR")}
+              </span>
+            </div>
+            {hasWholeChicken && (
+              <span className="text-sm text-muted-foreground">
+                pollo entero a definir
+              </span>
+            )}
           </div>
 
           {step === "cart" ? (
