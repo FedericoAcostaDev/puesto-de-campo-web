@@ -137,7 +137,7 @@ export default function Index() {
               <div className="flex justify-between items-end mb-10">
                 <div className="space-y-2">
                   <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground">
-                    Ofertas <span className="text-primary">Especiales</span>
+                    Promociones
                   </h2>
                   <p className="text-muted-foreground text-sm md:text-base">
                     Aprovechá estas promociones por tiempo limitado.
