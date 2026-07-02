@@ -184,7 +184,12 @@ export function CartDrawer() {
                       <h4 className="font-bold text-sm leading-tight">
                         {item.name}
                       </h4>
-                      <p className="text-primary font-bold text-sm">
+                      {item.purchaseLabel && (
+                        <p className="text-[11px] text-muted-foreground mt-1">
+                          {item.purchaseLabel}
+                        </p>
+                      )}
+                      <p className="text-primary font-bold text-sm mt-1">
                         ${item.price.toLocaleString("es-AR")}
                       </p>
                     </div>

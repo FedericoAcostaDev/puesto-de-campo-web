@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useCart } from "@/contexts/CartContext";
@@ -8,11 +8,15 @@ import { Plus, ArrowLeft, ShieldCheck, Truck, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Layout } from "@/components/layout/Layout";
 import { triggerCartFeedback } from "@/lib/cartFeedback";
+import { PurchaseSelector } from "@/components/store/PurchaseSelector";
+import { PurchaseSelection, getPurchaseSelection, isWholeChickenProduct } from "@/lib/purchase";
 
 const DetalleProducto = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const [selectedPurchase, setSelectedPurchase] = useState<PurchaseSelection | null>(null);
+  const isWholeChicken = product ? isWholeChickenProduct(product) : false;
 
   // Scroll to top automatically when the page opens
   useEffect(() => {
@@ -53,7 +57,8 @@ const DetalleProducto = () => {
     if (product) {
       triggerVibration(15); // Subtle haptic tick
       triggerVisualFeedback(e);
-      addToCart(product);
+      const selection = selectedPurchase ?? getPurchaseSelection(product, 1);
+      addToCart(product, selection);
       toast.success(`${product.name} agregado`, {
         description: "Se agregó al carrito correctamente",
       });
@@ -140,7 +145,7 @@ const DetalleProducto = () => {
                     Precio
                   </span>
                   <span className="text-3xl md:text-5xl font-bold text-foreground tracking-tighter">
-                    {formatPrice(product.price)}
+                    {isWholeChicken ? "A definir" : formatPrice(product.price)}
                   </span>
                 </div>
                 <div className="h-10 w-px bg-border hidden md:block" />
@@ -152,6 +157,10 @@ const DetalleProducto = () => {
                     {product.weight}
                   </span>
                 </div>
+              </div>
+
+              <div className="pt-4">
+                <PurchaseSelector product={product} onSelectionChange={setSelectedPurchase} />
               </div>
 
               {/* Desktop Add Button */}
