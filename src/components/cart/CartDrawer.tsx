@@ -42,6 +42,10 @@ export function CartDrawer() {
     notes: "",
   });
 
+  const [discountCode, setDiscountCode] = useState("");
+  const [showDiscountInput, setShowDiscountInput] = useState(false);
+  const [discountStatus, setDiscountStatus] = useState<"idle" | "applied" | "invalid">("idle");
+
   const {
     items,
     isCartOpen,
@@ -426,20 +430,77 @@ export function CartDrawer() {
         </ScrollArea>
 
         <div className="p-6 bg-background border-t border-border mt-auto">
-          <div className="flex flex-col gap-1 mb-6">
-            <div className="flex justify-between items-center">
-              <span className="text-muted-foreground font-medium">
-                Subtotal estimado:
-              </span>
-              <span className="text-2xl font-bold text-primary font-display">
-                ${totalPrice.toLocaleString("es-AR")}
-              </span>
-            </div>
-            {hasWholeChicken && (
-              <span className="text-sm text-muted-foreground">
-                pollo entero a definir
-              </span>
+          <div className="space-y-4 mb-6">
+            {discountStatus === "applied" ? (
+              <div className="rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+                Código aplicado
+              </div>
+            ) : discountStatus === "invalid" ? (
+              <div className="space-y-3">
+                <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                  Código no válido
+                </div>
+                <Button
+                  variant="secondary"
+                  className="w-full h-12 rounded-2xl"
+                  onClick={() => {
+                    setShowDiscountInput(true);
+                    setDiscountStatus("idle");
+                  }}
+                >
+                  Reingresar código
+                </Button>
+              </div>
+            ) : !showDiscountInput ? (
+              <Button
+                variant="secondary"
+                className="w-full h-12 rounded-2xl"
+                onClick={() => setShowDiscountInput(true)}
+              >
+                Tengo código de descuento
+              </Button>
+            ) : (
+              <div className="space-y-2">
+                <Label htmlFor="discount-code" className="text-sm font-semibold">
+                  Código de descuento
+                </Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="discount-code"
+                    placeholder="Ingresá tu código"
+                    value={discountCode}
+                    onChange={(e) => setDiscountCode(e.target.value)}
+                    className="bg-background flex-1"
+                  />
+                  <Button
+                    variant="secondary"
+                    className="h-11 px-4"
+                    onClick={() => {
+                      setShowDiscountInput(false);
+                      setDiscountStatus(discountCode.trim() ? "applied" : "invalid");
+                    }}
+                  >
+                    Aplicar
+                  </Button>
+                </div>
+              </div>
             )}
+
+            <div className="flex flex-col gap-1">
+              <div className="flex justify-between items-center">
+                <span className="text-muted-foreground font-medium">
+                  Subtotal estimado:
+                </span>
+                <span className="text-2xl font-bold text-primary font-display">
+                  ${totalPrice.toLocaleString("es-AR")}
+                </span>
+              </div>
+              {hasWholeChicken && (
+                <span className="text-sm text-muted-foreground">
+                  pollo entero a definir
+                </span>
+              )}
+            </div>
           </div>
 
           {step === "cart" ? (
