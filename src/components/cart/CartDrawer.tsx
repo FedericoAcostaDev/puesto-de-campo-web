@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Minus,
   Plus,
@@ -12,6 +12,7 @@ import {
   TriangleAlert,
 } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
+import { useDiscountCodes } from "@/hooks/useDiscountCodes";
 import {
   Sheet,
   SheetContent,
@@ -45,6 +46,7 @@ export function CartDrawer() {
   const [discountCode, setDiscountCode] = useState("");
   const [showDiscountInput, setShowDiscountInput] = useState(false);
   const [discountStatus, setDiscountStatus] = useState<"idle" | "applied" | "invalid">("idle");
+  const [discountMessage, setDiscountMessage] = useState<string>("");
 
   const {
     items,
@@ -55,6 +57,9 @@ export function CartDrawer() {
     totalPrice,
     clearCart,
   } = useCart();
+
+  const { discountCodes } = useDiscountCodes();
+  const [appliedDiscount, setAppliedDiscount] = useState<"applied" | "invalid" | "idle">("idle");
 
   // Validation Logic
   const errors = {
@@ -433,12 +438,12 @@ export function CartDrawer() {
           <div className="space-y-4 mb-6">
             {discountStatus === "applied" ? (
               <div className="rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
-                Código aplicado
+                {discountMessage || 'Código aplicado'}
               </div>
             ) : discountStatus === "invalid" ? (
               <div className="space-y-3">
                 <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                  Código no válido
+                  {discountMessage || 'Código no válido'}
                 </div>
                 <Button
                   variant="secondary"
@@ -446,6 +451,7 @@ export function CartDrawer() {
                   onClick={() => {
                     setShowDiscountInput(true);
                     setDiscountStatus("idle");
+                    setDiscountMessage("");
                   }}
                 >
                   Reingresar código
@@ -472,12 +478,29 @@ export function CartDrawer() {
                     onChange={(e) => setDiscountCode(e.target.value)}
                     className="bg-background flex-1"
                   />
-                  <Button
+                      <Button
                     variant="secondary"
                     className="h-11 px-4"
                     onClick={() => {
-                      setShowDiscountInput(false);
-                      setDiscountStatus(discountCode.trim() ? "applied" : "invalid");
+                      const trimmedCode = discountCode.trim().toUpperCase();
+                      const matched = discountCodes.find(
+                        (discount) =>
+                          discount.active &&
+                          discount.code.toUpperCase() === trimmedCode,
+                      );
+
+                      if (matched) {
+                        setDiscountStatus("applied");
+                        const formattedValue = matched.type === 'porcentaje'
+                          ? `${matched.value}%`
+                          : `$${matched.value.toLocaleString('es-AR')}`;
+                        setDiscountMessage(`Código aplicado: ${formattedValue}`);
+                        setShowDiscountInput(false);
+                      } else {
+                        setDiscountStatus("invalid");
+                        setDiscountMessage("Código no válido");
+                        setShowDiscountInput(false);
+                      }
                     }}
                   >
                     Aplicar

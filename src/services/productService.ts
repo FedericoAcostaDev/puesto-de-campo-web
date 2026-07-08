@@ -1,14 +1,35 @@
 import Papa from 'papaparse';
-import { Product } from '../types';
+import { Product, DiscountCode } from '../types';
 import { createSlug } from '../lib/utils';
 
 /**
  * Cargamos la URL desde las variables de entorno (.env).
  */
 const SHEET_URL = import.meta.env.VITE_SHEET_URL;
+const DISCOUNT_SHEET_URL = import.meta.env.VITE_DISCOUNT_SHEET_URL ?? SHEET_URL;
 
 // Definimos la constante de la imagen por defecto
 const DEFAULT_IMAGE = '/products/no-image.jpeg';
+
+const parseDiscountValue = (value: string, type: string): number => {
+  const normalized = String(value)
+    .trim()
+    .replace(/\$/g, '')
+    .replace(/%/g, '')
+    .replace(/\s+/g, '')
+    .replace(/\./g, '')
+    .replace(',', '.');
+
+  const numberValue = Number(normalized);
+  if (Number.isNaN(numberValue)) return 0;
+  return type.toLowerCase().includes('porcentaje') ? numberValue : numberValue;
+};
+
+const parseActive = (value: string): boolean => {
+  const normalized = String(value).trim().toLowerCase();
+  return normalized === 'activo' || normalized === 'true' || normalized === '1';
+};
+
 
 /**
  * Función auxiliar para limpiar y formatear URLs de Google Drive.
@@ -88,6 +109,60 @@ export const fetchProductsFromSheet = async (): Promise<Product[]> => {
     });
   } catch (error) {
     console.error("Error crítico al obtener productos:", error);
+    return [];
+  }
+};
+
+export const fetchDiscountCodesFromSheet = async (): Promise<DiscountCode[]> => {
+  if (!DISCOUNT_SHEET_URL) {
+    console.error("Error: La variable VITE_DISCOUNT_SHEET_URL o VITE_SHEET_URL no está definida en el archivo .env");
+    return [];
+  }
+
+  try {
+    const response = await fetch(DISCOUNT_SHEET_URL);
+    if (!response.ok) {
+      throw new Error(`Error de red: ${response.statusText}`);
+    }
+
+    const csvText = await response.text();
+
+    return new Promise((resolve, reject) => {
+      Papa.parse(csvText, {
+        header: true,
+        dynamicTyping: false,
+        skipEmptyLines: true,
+        complete: (results) => {
+          const cleanData = (results.data as any[])
+            .filter((row) => row && (row.id || row.code))
+            .map((row) => {
+              const rawType = String(row.tipo || row.type || '').trim().toLowerCase();
+              const rawValue = String(row.valor || row.value || '').trim();
+              const code = String(row.id || row.code || '').trim();
+              const type = rawType.includes('porcentaje') || rawType.includes('percent') || rawValue.includes('%')
+                ? 'porcentaje'
+                : 'monto';
+
+              return {
+                id: code,
+                code,
+                type,
+                value: parseDiscountValue(rawValue, type),
+                active: parseActive(String(row.activo || row.active || '')),
+                description: String(row.descripcion || row.description || '').trim() || undefined,
+              };
+            });
+
+          resolve(cleanData as DiscountCode[]);
+        },
+        error: (error: Error) => {
+          console.error("Error al parsear los códigos de descuento:", error);
+          reject(error);
+        },
+      });
+    });
+  } catch (error) {
+    console.error("Error crítico al obtener códigos de descuento:", error);
     return [];
   }
 };
